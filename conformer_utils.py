@@ -26,6 +26,41 @@ def loadDescriptorFile(path, label):
 
     return (descs, numRotatableBonds)
 
+def checkMissing(path, dtype):
+    missing_actives=list()
+    missing_decoys=list()
+
+    active_filenames = glob(path + "/active_mol_*." + dtype)
+    decoy_filenames = glob(path + "/decoy_mol_*." + dtype)
+
+    #print(active_filenames)
+    #print(decoy_filenames)
+
+    max_active = 0
+    i=0
+    while i < len(active_filenames)+len(missing_actives)+1:
+        #print("a:"+str(i)+" - "+str(len(active_filenames)+len(missing_actives)+1))
+        if path+"/active_mol_"+str(i)+"."+dtype not in active_filenames:
+            if i <= len(active_filenames)+1:
+                missing_actives.append(i)
+        elif max_active < i:
+            max_active=i
+        i+=1
+
+
+    #print(max_active+len(decoy_filenames)+len(missing_decoys)+1)
+
+    while i < max_active+len(decoy_filenames)+len(missing_decoys)+2:
+        #print("d:" + str(i)+" - "+str(max_active+len(decoy_filenames)+len(missing_decoys)+2))
+        if path+"/decoy_mol_"+str(i)+"."+dtype not in decoy_filenames:
+            if i <= max_active+len(decoy_filenames)+1:
+               missing_decoys.append(i)
+        i+=1
+
+    return (missing_actives, missing_decoys)
+
+
+
 # Selectively load the USR descriptors in the given path according to the parameters
 # num_actives: the number of actives to load. If <= 1 it is taken as a percentage of the total number of actives
 # active_decoy_ratio: The number of decoys to load as a fraction of the number of actives. -1 to maintain the population ratio of decoys to actives

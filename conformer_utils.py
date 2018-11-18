@@ -5,8 +5,8 @@ from random import shuffle
 
 # Returns the number of active and decoy molecules present in the given folder
 def getDescriptorStats(path):
-    active_filenames = glob(path + "active_mol_*.usr")
-    decoy_filenames = glob(path + "decoy_mol_*.usr")
+    active_filenames = glob(path + "active_*.sdf")
+    decoy_filenames = glob(path + "decoy_*.sdf")
 
     return {"num_actives": len(active_filenames), "num_decoys": len(decoy_filenames)}
     
@@ -59,7 +59,8 @@ def checkMissing(path, dtype):
 
     return (missing_actives, missing_decoys)
 
-
+def argsort(seq):
+    return sorted(range(len(seq)), key=seq.__getitem__)
 
 # Selectively load the USR descriptors in the given path according to the parameters
 # num_actives: the number of actives to load. If <= 1 it is taken as a percentage of the total number of actives
@@ -68,10 +69,10 @@ def checkMissing(path, dtype):
 # return_type: "SEPARATE" | "LUMPED". If SEPARATE, a separate Pandas DataFrame with conformer description for each molecule will be returned in a list along with the path for each descriptor file. If LUMPED then all the conformer descriptors for all the loaded molecules will be returned in a single DataFrame.
 def loadDescriptors(path, num_actives, active_decoy_ratio=1, dtype="usr", selection_policy="SEQUENTIAL",
                     return_type="SEPARATE", exclusion_list=None):
-    active_filenames = glob(path + "active_mol_*." + dtype)
+    active_filenames = glob(path + "active_*." + dtype)
     print(len(active_filenames))
 
-    decoy_filenames = glob(path + "decoy_mol_*." + dtype)
+    decoy_filenames = glob(path + "decoy_*." + dtype)
 
     if num_actives <= 1:
         num_actives = len(active_filenames) * num_actives
@@ -85,9 +86,13 @@ def loadDescriptors(path, num_actives, active_decoy_ratio=1, dtype="usr", select
     records = []
     if selection_policy == "SEQUENTIAL":
         numToLoad = min(num_actives, len(active_filenames))
+        sortedNdx_actives = argsort(active_filenames)
+
         i = 0
+
         while len(records) < numToLoad:
-            fpath = path + "active_mol_" + str(i) + "." + dtype
+            #fpath = path + "active_mol_" + str(i) + "." + dtype
+            fpath = path + active_filenames[sortedNdx_actives[i]]
             if (exclusion_list is not None) and (fpath in exclusion_list):
                 i += 1
                 continue
@@ -99,9 +104,12 @@ def loadDescriptors(path, num_actives, active_decoy_ratio=1, dtype="usr", select
             i += 1
 
         numToLoad = numToLoad + min(num_decoys, len(decoy_filenames))
-        i = len(active_filenames)
+        #i = len(active_filenames)
+        sortedNdx_decoys = argsort(decoy_filenames)
+        i=0
         while len(records) < numToLoad:
-            fpath = path + "decoy_mol_" + str(i) + "." + dtype
+            #fpath = path + "decoy_mol_" + str(i) + "." + dtype
+            fpath = path + decoy_filenames[sortedNdx_decoys]
             if (exclusion_list is not None) and (fpath in exclusion_list):
                 i += 1
                 continue

@@ -47,13 +47,13 @@ sc.addFile("simClasses.py")
 sc.addFile("conformer_utils.py")
 
 #homeDir = "/home/etienne/MScAI/dissertation"
-homeDir = "/home/ubuntu/data_vol/projects/dissertation/conf_gen"
-molfiles = [[homeDir+"/data2/Adenosine A2a receptor (GPCR)/", "actives_final.ism", "decoys_final.ism"],
-            [homeDir+"/data2/Progesterone Receptor/", "actives_final.ism", "decoys_final.ism"],
-            [homeDir+"/data2/Neuraminidase/", "actives_final.ism", "decoys_final.ism"],
-            [homeDir+"/data2/Thymidine kinase/", "actives_final.ism", "decoys_final.ism"],
-            [homeDir+"/data2/Leukotriene A4 hydrolase (Protease)/", "actives_final.ism", "decoys_final.ism"],
-            [homeDir+"/data2/HIVPR/", "actives_final.ism", "decoys_final.ism"]]
+homeDir = "/home/ubuntu/data_vol/projects/dissertation"
+molfiles = [[homeDir+"/Conformers/Adenosine A2a receptor (GPCR)/", "actives_final.ism", "decoys_final.ism"],
+            [homeDir+"/Conformers/Progesterone Receptor/", "actives_final.ism", "decoys_final.ism"],
+            [homeDir+"/Conformers/Neuraminidase/", "actives_final.ism", "decoys_final.ism"],
+            [homeDir+"/Conformers/Thymidine kinase/", "actives_final.ism", "decoys_final.ism"],
+            [homeDir+"/Conformers/Leukotriene A4 hydrolase (Protease)/", "actives_final.ism", "decoys_final.ism"],
+            [homeDir+"/Conformers/HIVPR/", "actives_final.ism", "decoys_final.ism"]]
 
 
 def getEnrichmentFactor(threshold, ds, sort_by="prob", truth="truth"):
@@ -69,7 +69,7 @@ def getEnrichmentFactor(threshold, ds, sort_by="prob", truth="truth"):
 
     return ef
 
-numActives=10
+numActives=-1
 
 molNdx=1
 

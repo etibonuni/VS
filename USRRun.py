@@ -46,14 +46,14 @@ sc = spark.sparkContext
 sc.addFile("simClasses.py")
 sc.addFile("conformer_utils.py")
 
-homeDir = "/home/etienne/MScAI/dissertation"
-#homeDir = "/home/ubuntu/data_vol/projects/dissertation/conf_gen"
-molfiles = [[homeDir+"/data3/Adenosine A2a receptor (GPCR)/", "actives_final.ism", "decoys_final.ism"],
-            [homeDir+"/data3/Progesterone Receptor/", "actives_final.ism", "decoys_final.ism"],
-            [homeDir+"/data3/Neuraminidase/", "actives_final.ism", "decoys_final.ism"],
-            [homeDir+"/data3/Thymidine kinase/", "actives_final.ism", "decoys_final.ism"],
-            [homeDir+"/data3/Leukotriene A4 hydrolase (Protease)/", "actives_final.ism", "decoys_final.ism"],
-            [homeDir+"/data3/HIVPR/", "actives_final.ism", "decoys_final.ism"]]
+#homeDir = "/home/etienne/MScAI/dissertation"
+homeDir = "/home/ubuntu/data_vol/projects/dissertation/conf_gen"
+molfiles = [[homeDir+"/data2/Adenosine A2a receptor (GPCR)/", "actives_final.ism", "decoys_final.ism"],
+            [homeDir+"/data2/Progesterone Receptor/", "actives_final.ism", "decoys_final.ism"],
+            [homeDir+"/data2/Neuraminidase/", "actives_final.ism", "decoys_final.ism"],
+            [homeDir+"/data2/Thymidine kinase/", "actives_final.ism", "decoys_final.ism"],
+            [homeDir+"/data2/Leukotriene A4 hydrolase (Protease)/", "actives_final.ism", "decoys_final.ism"],
+            [homeDir+"/data2/HIVPR/", "actives_final.ism", "decoys_final.ism"]]
 
 
 def getEnrichmentFactor(threshold, ds, sort_by="prob", truth="truth"):

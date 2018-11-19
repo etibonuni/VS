@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="de6588df-a1d3-4c63-81e3-ee5d4e68217b" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/USRRun.py" afterPath="$PROJECT_DIR$/USRRun.py" />
       <change beforePath="$PROJECT_DIR$/conformer_utils.py" afterPath="$PROJECT_DIR$/conformer_utils.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -20,7 +19,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="USRRun.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="USRRun.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/USRRun.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="182">
@@ -54,11 +53,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="conformer_utils.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="conformer_utils.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/conformer_utils.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="284">
-              <caret line="102" column="0" lean-forward="false" selection-start-line="102" selection-start-column="0" selection-end-line="102" selection-end-column="0" />
+            <state relative-caret-position="374">
+              <caret line="111" column="55" lean-forward="false" selection-start-line="111" selection-start-column="55" selection-end-line="111" selection-end-column="55" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -107,8 +106,8 @@
         <option value="$PROJECT_DIR$/test/checkmissing.py" />
         <option value="$PROJECT_DIR$/checkmissing.py" />
         <option value="$PROJECT_DIR$/.gitignore" />
-        <option value="$PROJECT_DIR$/conformer_utils.py" />
         <option value="$PROJECT_DIR$/USRRun.py" />
+        <option value="$PROJECT_DIR$/conformer_utils.py" />
       </list>
     </option>
   </component>
@@ -302,7 +301,14 @@
       <option name="project" value="LOCAL" />
       <updated>1542575801300</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Fixed loading">
+      <created>1542660787335</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1542660787335</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -340,7 +346,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Added checkmissing.py. Script to check for missing molecules in our dataset." />
     <MESSAGE value="Progress" />
-    <option name="LAST_COMMIT_MESSAGE" value="Progress" />
+    <MESSAGE value="Fixed loading" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed loading" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -415,22 +422,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/conformer_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="284">
-          <caret line="102" column="0" lean-forward="false" selection-start-line="102" selection-start-column="0" selection-end-line="102" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/USRRun.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="182">
           <caret line="48" column="1" lean-forward="false" selection-start-line="48" selection-start-column="1" selection-end-line="48" selection-end-column="1" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/conformer_utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="374">
+          <caret line="111" column="55" lean-forward="false" selection-start-line="111" selection-start-column="55" selection-end-line="111" selection-end-column="55" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
           </folding>
         </state>
       </provider>

@@ -69,7 +69,7 @@ def getEnrichmentFactor(threshold, ds, sort_by="prob", truth="truth"):
 
     return ef
 
-numActives=-1
+numActives=1
 
 molNdx=1
 

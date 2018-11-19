@@ -22,6 +22,9 @@ import pandas as pd
 import findspark
 
 from sklearn.metrics import roc_curve, auc
+import matplotlib
+matplotlib.use('Agg') # Must be before importing matplotlib.pyplot or pylab!
+
 import matplotlib.pyplot as plt
 
 findspark.init()

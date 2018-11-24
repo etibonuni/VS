@@ -70,7 +70,6 @@ def argsort(seq):
 def loadDescriptors(path, num_actives, active_decoy_ratio=1, dtype="usr", selection_policy="SEQUENTIAL",
                     return_type="SEPARATE", exclusion_list=None):
     active_filenames = glob(path + "active_*." + dtype)
-    print(len(active_filenames))
 
     decoy_filenames = glob(path + "decoy_*." + dtype)
 
@@ -81,6 +80,8 @@ def loadDescriptors(path, num_actives, active_decoy_ratio=1, dtype="usr", select
         active_decoy_ratio = float(len(decoy_filenames) / len(active_filenames))
 
     num_decoys = num_actives * active_decoy_ratio
+
+    print("Loading "+str(num_actives)+" actives and "+str(num_decoys)+" decoys.")
 
     paths = []
     records = []
@@ -100,7 +101,7 @@ def loadDescriptors(path, num_actives, active_decoy_ratio=1, dtype="usr", select
             paths.append(fpath)
 
             mol = loadDescriptorFile(fpath, True)
-            records.append((mol[0], mol[1], True))
+            records.append((mol[0].values.astype(float), mol[1], True))
             i += 1
 
         numToLoad = numToLoad + min(num_decoys, len(decoy_filenames))
@@ -117,7 +118,7 @@ def loadDescriptors(path, num_actives, active_decoy_ratio=1, dtype="usr", select
             paths.append(fpath)
 
             mol = loadDescriptorFile(fpath, False)
-            records.append((mol[0], mol[1], False))
+            records.append((mol[0].values.astype(float), mol[1], False))
 
             i += 1
     else:
@@ -137,7 +138,7 @@ def loadDescriptors(path, num_actives, active_decoy_ratio=1, dtype="usr", select
                 paths.append(fpath)
 
                 mol = loadDescriptorFile(fpath, True)
-                records.append((mol[0], mol[1], True))
+                records.append((mol[0].values.astype(float), mol[1], True))
 
                 i += 1
 
@@ -155,7 +156,7 @@ def loadDescriptors(path, num_actives, active_decoy_ratio=1, dtype="usr", select
                 paths.append(fpath)
 
                 mol = loadDescriptorFile(fpath, False)
-                records.append((mol[0], mol[1], False))
+                records.append((mol[0].values.astype(float), mol[1], False))
 
                 i += 1
         else:

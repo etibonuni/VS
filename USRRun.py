@@ -39,7 +39,7 @@ spark = SparkSession \
     .appName("Test Etienne JOB") \
     .master("spark://"+LOCAL_IP+":7077") \
     .config("spark.executor.cores", 2) \
-    .config("spark.cores.max", 16) \
+    .config("spark.cores.max", 32) \
     .config("spark.python.worker.memory", "2g") \
     .config("spark.executor.memory", "2g") \
     .config("spark.executorEnv.SPARK_LOCAL_IP", LOCAL_IP) \
@@ -49,8 +49,8 @@ sc = spark.sparkContext
 sc.addFile("simClasses.py")
 sc.addFile("conformer_utils.py")
 
-#homeDir = "/home/etienne/MScAI/dissertation"
-homeDir = "/home/ubuntu/data_vol/projects/dissertation"
+homeDir = "/home/etienne/MScAI/dissertation"
+#homeDir = "/home/ubuntu/data_vol/projects/dissertation"
 molfiles = [[homeDir+"/Conformers/Adenosine A2a receptor (GPCR)/", "actives_final.ism", "decoys_final.ism"],
             [homeDir+"/Conformers/Progesterone Receptor/", "actives_final.ism", "decoys_final.ism"],
             [homeDir+"/Conformers/Neuraminidase/", "actives_final.ism", "decoys_final.ism"],
@@ -72,15 +72,8 @@ def getEnrichmentFactor(threshold, ds, sort_by="prob", truth="truth"):
 
     return ef
 
-numActives=1
 
-molNdx=1
-
-(sim_ds, sim_paths) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="usr", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
-(sim_es_ds, sim_paths_es) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="esh", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
-(sim_es5_ds, sim_paths_es5) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="es5", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
-
-
+#print(sim_ds[0][0])
 def plotROCCurve(truth, preds, label, fileName):
     fpr, tpr, _ = roc_curve(truth.astype(int), preds)
 
@@ -116,9 +109,28 @@ def plotSimROC(mol_ds, results, fileName):
     # print(getEnrichmentFactor(0.01, sim_pd, sort_by="sim", truth="truth"))
     print("Mean EF@1%=", ef_mean)
 
+numActives=1
+
+molNdx=1
+
+(sim_ds, sim_paths) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="usr", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
+#(sim_es_ds, sim_paths_es) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="esh", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
+#(sim_es5_ds, sim_paths_es5) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="es5", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
+
+
 simobj = scls.USRMoleculeSim(sim_ds, sim_paths)
 usr_results = scls.runSparkScreening(sc, simobj)
 
+# import pickle
+#
+# s=pickle.dumps(simobj)
+# print(len(s))
+
+#print(simobj.getSim(0,1))
+#usr_results = simobj.runSparkScreening(sc)
+
+#print(usr_results)
+#
 simobj_es = scls.USRMoleculeSim(sim_es_ds, sim_paths_es)
 usr_results_esh = scls.runSparkScreening(sc, simobj_es)
 

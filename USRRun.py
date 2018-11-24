@@ -15,8 +15,6 @@ from glob import glob
 from random import shuffle
 import os
 from sklearn.manifold import TSNE
-import matplotlib.pyplot as plt
-import simClasses as scls
 from itertools import chain
 import pandas as pd
 import findspark
@@ -27,6 +25,7 @@ matplotlib.use('Agg') # Must be before importing matplotlib.pyplot or pylab!
 
 import matplotlib.pyplot as plt
 
+import simClasses as scls
 findspark.init()
 
 from pyspark import SparkContext, SparkConf
@@ -72,7 +71,7 @@ def getEnrichmentFactor(threshold, ds, sort_by="prob", truth="truth"):
 
     return ef
 
-numActives=10
+numActives=200
 
 molNdx=0
 

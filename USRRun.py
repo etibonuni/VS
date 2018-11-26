@@ -38,8 +38,8 @@ spark = SparkSession \
     .builder \
     .appName("Test Etienne JOB") \
     .master("spark://"+LOCAL_IP+":7077") \
-    .config("spark.executor.cores", 2) \
-    .config("spark.cores.max", 32) \
+    .config("spark.executor.cores", 1) \
+    .config("spark.cores.max", 3) \
     .config("spark.python.worker.memory", "2g") \
     .config("spark.executor.memory", "2g") \
     .config("spark.executorEnv.SPARK_LOCAL_IP", LOCAL_IP) \
@@ -109,31 +109,24 @@ def plotSimROC(mol_ds, results, fileName):
     # print(getEnrichmentFactor(0.01, sim_pd, sort_by="sim", truth="truth"))
     print("Mean EF@1%=", ef_mean)
 
-numActives=1
+numActives=100
 
 molNdx=1
 
 (sim_ds, sim_paths) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="usr", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
-#(sim_es_ds, sim_paths_es) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="esh", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
-#(sim_es5_ds, sim_paths_es5) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="es5", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
+(sim_es_ds, sim_paths_es) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="esh", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
+(sim_es5_ds, sim_paths_es5) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="es5", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
 
-
+print("Processing USR");
 simobj = scls.USRMoleculeSim(sim_ds, sim_paths)
-usr_results = scls.runSparkScreening(sc, simobj)
+#usr_results_orig = scls.runSparkScreening(sc, simobj)
+usr_results = np.array(simobj.runSparkScreening(sc)).transpose()
 
-# import pickle
-#
-# s=pickle.dumps(simobj)
-# print(len(s))
-
-#print(simobj.getSim(0,1))
-#usr_results = simobj.runSparkScreening(sc)
-
-#print(usr_results)
-#
+print("Processing Electroshape 4-d")
 simobj_es = scls.USRMoleculeSim(sim_es_ds, sim_paths_es)
 usr_results_esh = scls.runSparkScreening(sc, simobj_es)
 
+print("Processing Electroshape 5-d")
 simobj_es5 = scls.USRMoleculeSim(sim_es5_ds, sim_paths_es5)
 usr_results_es5 = scls.runSparkScreening(sc, simobj_es5)
 

@@ -299,14 +299,27 @@ class USRMoleculeSim(MoleculeSimilarity):
 
         return np.max(sims)
 
+    def doSim(self, candidate, actives_bc):
+        #resultsMol = [simObj_bc.value.getSim(templateNdx, molNdx) for molNdx in range(0, len(simObj_bc.value.conformers))]
+
+        resultsMol = [np.max(manhattanSim(candidate, actives_bc.value[i])) for i in range(0, len(actives_bc.value))]
+        return resultsMol
+
     def runSparkScreening(self, sc):
-        activeRange = sc.range(0, sum([self.conformers[x][2] for x in range(0, len(self.conformers))]))
+        #activeRange = sc.range(0, sum([self.conformers[x][2] for x in range(0, len(self.conformers))]))
+
+        actives = [np.array(self.conformers[i][0]) for i in range(0, len(self.conformers)) if self.conformers[i][2]==True]
+
         # print(activeRange.collect())
         # activeRange=sc.range(0,3,numSlices=2)
 
-        simObj_bc = sc.broadcast(self);
+        actives_bc = sc.broadcast(actives);
 
-        return activeRange.map(lambda x: self.doSim(x, simObj_bc)).collect()
+        candidates = sc.parallelize([self.conformers[i][0] for i in range(0, len(self.conformers) )])
+
+        return candidates.map(lambda x: self.doSim(np.array(x), actives_bc)).collect()
+
+        #return activeRange.map(lambda x: self.doSim(x, simObj_bc)).collect()
 
 
 class USR_MNPSim(MoleculeSimilarity):

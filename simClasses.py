@@ -251,11 +251,24 @@ class MoleculeSimilarity:
         
         return
         
-    def getSim(mol1, mol2):
+    def getSim(self, mol1, mol2):
         return 0
    
-    def getConformers():
+    def getConformers(self):
         return self.conformers
+
+    def doSim(self, templateNdx, simObj_bc):
+        resultsMol = [simObj_bc.value.getSim(templateNdx, molNdx) for molNdx in range(0, len(simObj_bc.value.conformers))]
+        return resultsMol
+
+    def runSparkScreening(self, sc):
+        activeRange = sc.range(0, sum([self.conformers[x][2] for x in range(0, len(self.conformers))]))
+        # print(activeRange.collect())
+        # activeRange=sc.range(0,3,numSlices=2)
+
+        simObj_bc = sc.broadcast(self);
+
+        return activeRange.map(lambda x: self.doSim(x, simObj_bc)).collect()
     
 def manhattanDist(v1, v2):
     return np.sum(abs(np.array(v1)-np.array(v2)), axis=1)
@@ -263,26 +276,52 @@ def manhattanDist(v1, v2):
 def manhattanSim(v1, v2):
     #print("v1=", v1)
     #print("v2=", v2)
-    dim = v1.shape
-    if len(dim)==1:
-        v1 = np.reshape(np.array(v1), (1,len(v1)))
-        v2 = np.reshape(np.array(v2), (1,len(v2)))
+    dim = v1.shape[1]
+
+    a = np.repeat(v1, v2.shape[0], axis=0)
+    #b = np.repeat(v2, v1.shape[0], axis=0)
+    b = np.tile(v2, (v1.shape[0], 1))
+#    if len(dim)==1:
+#        v1 = np.reshape(np.array(v1), (1,len(v1)))
+#        v2 = np.reshape(np.array(v2), (1,len(v2)))
         
-    return 1.0/(1+manhattanDist(v1, v2)/dim)
+    return 1.0/(1+manhattanDist(a, b)/dim)
     
 class USRMoleculeSim(MoleculeSimilarity):
 
     def getSim(self, mol1, mol2):
         
-        mol1_confs = self.conformers[mol1][0].iloc[:,0:self.numcols]
-        mol2_confs = self.conformers[mol2][0].iloc[:,0:self.numcols]
-        #print(mol1_confs)
-        #print(len(mol1_confs), ", ", len(mol2_confs))
-        sims=[manhattanSim(c1, c2) for (i1, c1) in mol1_confs.iterrows() for (i2,c2) in mol2_confs.iterrows()]
-        #sims = np.fromfunction(np.vectorize(lambda x1, x2: manhattanSim(mol1_confs.iloc[int(x1)].values, mol2_confs.iloc[int(x2)].values)[0]), (len(mol1_confs), len(mol2_confs)))
+        mol1_confs = self.conformers[mol1][0][:,0:self.numcols]
+        mol2_confs = self.conformers[mol2][0][:,0:self.numcols]
+        #sims=[manhattanSim(c1, mol2_confs) for c1 in mol1_confs]
+
+        sims = manhattanSim(mol1_confs, mol2_confs)
 
         return np.max(sims)
-        
+
+    def doSim(self, candidate, actives_bc):
+        #resultsMol = [simObj_bc.value.getSim(templateNdx, molNdx) for molNdx in range(0, len(simObj_bc.value.conformers))]
+
+        resultsMol = [np.max(manhattanSim(candidate, actives_bc.value[i])) for i in range(0, len(actives_bc.value))]
+        return resultsMol
+
+    def runSparkScreening(self, sc):
+        #activeRange = sc.range(0, sum([self.conformers[x][2] for x in range(0, len(self.conformers))]))
+
+        actives = [np.array(self.conformers[i][0]) for i in range(0, len(self.conformers)) if self.conformers[i][2]==True]
+
+        # print(activeRange.collect())
+        # activeRange=sc.range(0,3,numSlices=2)
+
+        actives_bc = sc.broadcast(actives);
+
+        candidates = sc.parallelize([self.conformers[i][0] for i in range(0, len(self.conformers) )])
+
+        return candidates.map(lambda x: self.doSim(np.array(x), actives_bc)).collect()
+
+        #return activeRange.map(lambda x: self.doSim(x, simObj_bc)).collect()
+
+
 class USR_MNPSim(MoleculeSimilarity):
     def __init__(self, conformers, paths):
         super(USR_MNPSim, self).__init__( conformers, paths)

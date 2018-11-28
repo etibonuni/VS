@@ -317,6 +317,7 @@ class USRMoleculeSim(MoleculeSimilarity):
 
         candidates = sc.parallelize([self.conformers[i][0] for i in range(0, len(self.conformers) )])
 
+        candidates = candidates.repartition(10000)
         return candidates.map(lambda x: self.doSim(np.array(x), actives_bc)).collect()
 
         #return activeRange.map(lambda x: self.doSim(x, simObj_bc)).collect()

@@ -31,25 +31,31 @@ findspark.init()
 from pyspark import SparkContext, SparkConf
 from pyspark.sql import SparkSession
 
-LOCAL_IP = "spark-master"
+def initSpark():
+    LOCAL_IP = "spark-master"
 
-spark = SparkSession \
-    .builder \
-    .appName("Test Etienne JOB") \
-    .master("spark://"+LOCAL_IP+":7077") \
-    .config("spark.executor.cores", 2) \
-    .config("spark.cores.max", 32) \
-    .config("spark.python.worker.memory", "2g") \
-    .config("spark.executor.memory", "2g") \
-    .config("spark.executorEnv.SPARK_LOCAL_IP", LOCAL_IP) \
-    .getOrCreate()
+    spark = SparkSession \
+        .builder \
+        .appName("Test Etienne JOB") \
+        .master("spark://"+LOCAL_IP+":7077") \
+        .config("spark.executor.cores", 4) \
+        .config("spark.cores.max", 32) \
+        .config("spark.python.worker.memory", "8g") \
+        .config("spark.executor.memory", "5g") \
+        .config("spark.executor.heartbeatInterval", "100s") \
+        .config("spark.network.timeout", "400s") \
+        .config("spark.executorEnv.SPARK_LOCAL_IP", LOCAL_IP) \
+        .getOrCreate()
+    
+    sc = spark.sparkContext
+    sc.addFile("simClasses.py")
+    sc.addFile("conformer_utils.py")
+    
+    return sc
 
-sc = spark.sparkContext
-sc.addFile("simClasses.py")
-sc.addFile("conformer_utils.py")
 
-homeDir = "/home/etienne/MScAI/dissertation"
-#homeDir = "/home/ubuntu/data_vol/projects/dissertation"
+#homeDir = "/home/etienne/MScAI/dissertation"
+homeDir = "/home/ubuntu/data_vol/projects/dissertation"
 molfiles = [[homeDir+"/Conformers/Adenosine A2a receptor (GPCR)/", "actives_final.ism", "decoys_final.ism"],
             [homeDir+"/Conformers/Progesterone Receptor/", "actives_final.ism", "decoys_final.ism"],
             [homeDir+"/Conformers/Neuraminidase/", "actives_final.ism", "decoys_final.ism"],
@@ -111,23 +117,30 @@ numActives=1
 
 molNdx=1
 
-(sim_ds, sim_paths) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="usr", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
-(sim_es_ds, sim_paths_es) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="esh", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
-(sim_es5_ds, sim_paths_es5) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="es5", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
+#(sim_ds, sim_paths) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="usr", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
+#(sim_es_ds, sim_paths_es) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="esh", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
+#(sim_es5_ds, sim_paths_es5) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="es5", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
 
-print("Processing USR");
+print("Processing USR")
+sc = initSpark()
+(sim_ds, sim_paths) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="usr", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
 simobj = scls.USRMoleculeSim(sim_ds, sim_paths)
-#usr_results_orig = scls.runSparkScreening(sc, simobj)
-usr_results = np.array(simobj.runSparkScreening(sc)).transpose()
+usr_results = np.expand_dims(np.array(simobj.runSparkScreening(sc)), 1)
+sc.stop()
+plotSimROC(sim_ds, usr_results, "usr_plot.pdf")
 
 print("Processing Electroshape 4-d")
+sc = initSpark()
+(sim_es_ds, sim_paths_es) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="esh", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
 simobj_es = scls.USRMoleculeSim(sim_es_ds, sim_paths_es)
-usr_results_esh = scls.runSparkScreening(sc, simobj_es)
+usr_results_esh = np.expand_dims(np.array(simobj_es.runSparkScreening(sc)),1)
+sc.stop()
+plotSimROC(sim_es_ds, usr_results_esh, "esh_plot.pdf")
 
 print("Processing Electroshape 5-d")
+sc = initSpark()
+(sim_es5_ds, sim_paths_es5) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="es5", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
 simobj_es5 = scls.USRMoleculeSim(sim_es5_ds, sim_paths_es5)
-usr_results_es5 = scls.runSparkScreening(sc, simobj_es5)
-
-plotSimROC(sim_ds, usr_results, "usr_plot.pdf")
-plotSimROC(sim_es_ds, usr_results_esh, "esh_plot.pdf")
+usr_results_es5 = np.expand_dims(np.array(simobj_es5.runSparkScreening(sc)), 1)
+sc.stop()
 plotSimROC(sim_es5_ds, usr_results_es5, "es5_plot.pdf")

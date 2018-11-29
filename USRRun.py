@@ -113,7 +113,7 @@ def plotSimROC(mol_ds, results, fileName):
     # print(getEnrichmentFactor(0.01, sim_pd, sort_by="sim", truth="truth"))
     print("Mean EF@1%=", ef_mean)
 
-numActives=100
+numActives=10
 
 molNdx=1
 

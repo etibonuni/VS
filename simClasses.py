@@ -313,12 +313,14 @@ class USRMoleculeSim(MoleculeSimilarity):
         # print(activeRange.collect())
         # activeRange=sc.range(0,3,numSlices=2)
 
-        actives_bc = sc.broadcast(actives);
+        actives_bc = sc.broadcast(actives)
 
         candidates = sc.parallelize([self.conformers[i][0] for i in range(0, len(self.conformers) )])
 
-        candidates = candidates.repartition(10000)
-        return candidates.map(lambda x: self.doSim(np.array(x), actives_bc)).collect()
+        candidates = candidates.repartition(100)
+
+        c = candidates.map(lambda x: self.doSim(np.array(x), actives_bc)).collect()
+        return c
 
         #return activeRange.map(lambda x: self.doSim(x, simObj_bc)).collect()
 

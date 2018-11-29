@@ -113,7 +113,7 @@ def plotSimROC(mol_ds, results, fileName):
     # print(getEnrichmentFactor(0.01, sim_pd, sort_by="sim", truth="truth"))
     print("Mean EF@1%=", ef_mean)
 
-numActives=1
+numActives=100
 
 molNdx=1
 
@@ -125,7 +125,7 @@ print("Processing USR")
 sc = initSpark()
 (sim_ds, sim_paths) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="usr", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
 simobj = scls.USRMoleculeSim(sim_ds, sim_paths)
-usr_results = np.expand_dims(np.array(simobj.runSparkScreening(sc)), 1)
+usr_results = np.array(simobj.runSparkScreening(sc)).transpose()
 sc.stop()
 plotSimROC(sim_ds, usr_results, "usr_plot.pdf")
 
@@ -133,7 +133,7 @@ print("Processing Electroshape 4-d")
 sc = initSpark()
 (sim_es_ds, sim_paths_es) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="esh", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
 simobj_es = scls.USRMoleculeSim(sim_es_ds, sim_paths_es)
-usr_results_esh = np.expand_dims(np.array(simobj_es.runSparkScreening(sc)),1)
+usr_results_esh = np.array(simobj_es.runSparkScreening(sc)).transpose()
 sc.stop()
 plotSimROC(sim_es_ds, usr_results_esh, "esh_plot.pdf")
 
@@ -141,6 +141,6 @@ print("Processing Electroshape 5-d")
 sc = initSpark()
 (sim_es5_ds, sim_paths_es5) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="es5", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
 simobj_es5 = scls.USRMoleculeSim(sim_es5_ds, sim_paths_es5)
-usr_results_es5 = np.expand_dims(np.array(simobj_es5.runSparkScreening(sc)), 1)
+usr_results_es5 = np.array(simobj_es5.runSparkScreening(sc)).transpose()
 sc.stop()
 plotSimROC(sim_es5_ds, usr_results_es5, "es5_plot.pdf")

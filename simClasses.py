@@ -302,13 +302,13 @@ class USRMoleculeSim(MoleculeSimilarity):
     def doSim(self, candidate, actives_bc):
         #resultsMol = [simObj_bc.value.getSim(templateNdx, molNdx) for molNdx in range(0, len(simObj_bc.value.conformers))]
 
-        resultsMol = (candidate[0], [np.max(manhattanSim(candidate[1], actives_bc.value[i])) for i in range(0, len(actives_bc.value))])
+        resultsMol = (candidate[0], [np.max(manhattanSim(candidate[1][:,0:self.numcols], actives_bc.value[i])) for i in range(0, len(actives_bc.value))])
         return resultsMol
 
     def runSparkScreening(self, sc):
         #activeRange = sc.range(0, sum([self.conformers[x][2] for x in range(0, len(self.conformers))]))
 
-        actives = [np.array(self.conformers[i][0]) for i in range(0, len(self.conformers)) if self.conformers[i][2]==True]
+        actives = [np.array(self.conformers[i][0][:,0:self.numcols]) for i in range(0, len(self.conformers)) if self.conformers[i][2]==True]
 
         # print(activeRange.collect())
         # activeRange=sc.range(0,3,numSlices=2)

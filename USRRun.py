@@ -38,8 +38,8 @@ def initSpark():
         .builder \
         .appName("Test Etienne JOB") \
         .master("spark://"+LOCAL_IP+":7077") \
-        .config("spark.executor.cores", 1) \
-        .config("spark.cores.max", 3) \
+        .config("spark.executor.cores", 4) \
+        .config("spark.cores.max", 32) \
         .config("spark.python.worker.memory", "8g") \
         .config("spark.executor.memory", "5g") \
         .config("spark.executor.heartbeatInterval", "100s") \
@@ -54,8 +54,8 @@ def initSpark():
     return sc
 
 
-homeDir = "/home/etienne/MScAI/dissertation"
-#homeDir = "/home/ubuntu/data_vol/projects/dissertation"
+#homeDir = "/home/etienne/MScAI/dissertation"
+homeDir = "/home/ubuntu/data_vol/projects/dissertation"
 molfiles = [[homeDir+"/Conformers/Adenosine A2a receptor (GPCR)/", "actives_final.ism", "decoys_final.ism"],
             [homeDir+"/Conformers/Progesterone Receptor/", "actives_final.ism", "decoys_final.ism"],
             [homeDir+"/Conformers/Neuraminidase/", "actives_final.ism", "decoys_final.ism"],
@@ -71,8 +71,8 @@ def getEnrichmentFactor(threshold, ds, sort_by="prob", truth="truth"):
     # print(top_thresh)
 
     num_actives = sum(top_thresh[truth])
-    print("Number of actives found in top ", (threshold * 100), "%=", num_actives)
-    print("Number of actives expected =", (float(sum(sorted_ds[truth])) / len(sorted_ds)) * len(top_thresh))
+    #print("Number of actives found in top ", (threshold * 100), "%=", num_actives)
+    #print("Number of actives expected =", (float(sum(sorted_ds[truth])) / len(sorted_ds)) * len(top_thresh))
     ef = float(num_actives) / len(top_thresh) / (float(sum(sorted_ds[truth])) / len(sorted_ds))
 
     return ef
@@ -113,7 +113,7 @@ def plotSimROC(mol_ds, results, fileName):
     # print(getEnrichmentFactor(0.01, sim_pd, sort_by="sim", truth="truth"))
     print("Mean EF@1%=", ef_mean)
 
-numActives=10
+numActives=1
 
 molNdx=1
 
@@ -121,26 +121,30 @@ molNdx=1
 #(sim_es_ds, sim_paths_es) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="esh", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
 #(sim_es5_ds, sim_paths_es5) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="es5", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
 
-print("Processing USR")
-sc = initSpark()
-(sim_ds, sim_paths) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="usr", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
-simobj = scls.USRMoleculeSim(sim_ds, sim_paths)
-usr_results = np.array(simobj.runSparkScreening(sc)).transpose()
-sc.stop()
-plotSimROC(sim_ds, usr_results, "usr_plot.pdf")
+for molNdx in range(0, len(molfiles)):
 
-print("Processing Electroshape 4-d")
-sc = initSpark()
-(sim_es_ds, sim_paths_es) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="esh", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
-simobj_es = scls.USRMoleculeSim(sim_es_ds, sim_paths_es)
-usr_results_esh = np.array(simobj_es.runSparkScreening(sc)).transpose()
-sc.stop()
-plotSimROC(sim_es_ds, usr_results_esh, "esh_plot.pdf")
+    print("Processing "+molfiles[molNdx][0])
+    print("Processing USR")
+    sc = initSpark()
+    (sim_ds, sim_paths) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="usr", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
+    simobj = scls.USRMoleculeSim(sim_ds, sim_paths)
+    usr_results = np.array(simobj.runSparkScreening(sc)).transpose()
+    sc.stop()
+    plotSimROC(sim_ds, usr_results, "usr_plot_"+str(molNdx)+".pdf")
+    
+    print("Processing Electroshape 4-d")
+    sc = initSpark()
+    (sim_es_ds, sim_paths_es) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="esh", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
+    simobj_es = scls.USRMoleculeSim(sim_es_ds, sim_paths_es)
+    usr_results_esh = np.array(simobj_es.runSparkScreening(sc)).transpose()
+    sc.stop()
+    plotSimROC(sim_es_ds, usr_results_esh, "esh_plot_"+str(molNdx)+".pdf")
+    
+    print("Processing Electroshape 5-d")
+    sc = initSpark()
+    (sim_es5_ds, sim_paths_es5) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="es5", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
+    simobj_es5 = scls.USRMoleculeSim(sim_es5_ds, sim_paths_es5)
+    usr_results_es5 = np.array(simobj_es5.runSparkScreening(sc)).transpose()
+    sc.stop()
+    plotSimROC(sim_es5_ds, usr_results_es5, "es5_plot_"+str(molNdx)+".pdf")
 
-print("Processing Electroshape 5-d")
-sc = initSpark()
-(sim_es5_ds, sim_paths_es5) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="es5", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
-simobj_es5 = scls.USRMoleculeSim(sim_es5_ds, sim_paths_es5)
-usr_results_es5 = np.array(simobj_es5.runSparkScreening(sc)).transpose()
-sc.stop()
-plotSimROC(sim_es5_ds, usr_results_es5, "es5_plot.pdf")

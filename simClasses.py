@@ -269,7 +269,35 @@ class MoleculeSimilarity:
         simObj_bc = sc.broadcast(self);
 
         return activeRange.map(lambda x: self.doSim(x, simObj_bc)).collect()
-    
+
+
+def manhattanDist_old(v1, v2):
+    return np.sum(abs(np.array(v1) - np.array(v2)), axis=1)
+
+
+def manhattanSim_old(v1, v2):
+    # print("v1=", v1)
+    # print("v2=", v2)
+    dim = v1.shape
+    if len(dim) == 1:
+        v1 = np.reshape(np.array(v1), (1, len(v1)))
+        v2 = np.reshape(np.array(v2), (1, len(v2)))
+
+    return 1.0 / (1 + manhattanDist_old(v1, v2) / dim)
+
+
+class USRMoleculeSim_old(MoleculeSimilarity):
+
+    def getSim(self, mol1, mol2):
+        mol1_confs = self.conformers[mol1][0][:, 0:self.numcols]
+        mol2_confs = self.conformers[mol2][0][:, 0:self.numcols]
+        # print(mol1_confs)
+        # print(len(mol1_confs), ", ", len(mol2_confs))
+        sims = [manhattanSim_old(c1, c2) for c1 in mol1_confs for c2 in mol2_confs]
+        # sims = np.fromfunction(np.vectorize(lambda x1, x2: manhattanSim(mol1_confs.iloc[int(x1)].values, mol2_confs.iloc[int(x2)].values)[0]), (len(mol1_confs), len(mol2_confs)))
+
+        return np.max(sims)
+
 def manhattanDist(v1, v2):
     return np.sum(abs(np.array(v1)-np.array(v2)), axis=1)
 
@@ -312,15 +340,32 @@ class USRMoleculeSim(MoleculeSimilarity):
 
         # print(activeRange.collect())
         # activeRange=sc.range(0,3,numSlices=2)
-
-        actives_bc = sc.broadcast(actives)
-
-        candidates = sc.parallelize([(i, np.array(self.conformers[i][0][:,0:self.numcols]) ) for i in range(0, len(self.conformers) )])
+        # Split the actives into batches of 100 in order to prevent memory problems with the Spark cluster
+        candidates = sc.parallelize(
+            [(i, np.array(self.conformers[i][0][:, 0:self.numcols])) for i in range(0, len(self.conformers))])
 
         candidates = candidates.repartition(len(actives))
 
-        c = candidates.map(lambda x: self.doSim(x, actives_bc)).sortByKey(ascending=True).values().collect()
-        return c
+        batchSize=5
+        startNdx=0
+
+        results = None
+        while True:
+            actives_bc = sc.broadcast(actives[startNdx:min(startNdx+batchSize, len(actives))])
+
+
+            c = candidates.map(lambda x: self.doSim(x, actives_bc)).sortByKey(ascending=True).values().collect()
+            if results is None:
+                results = c
+            else:
+                results = np.append(results, c, axis=1)
+
+            startNdx = startNdx + batchSize
+
+            if startNdx >= len(actives):
+                break;
+
+        return results
 
         #return activeRange.map(lambda x: self.doSim(x, simObj_bc)).collect()
 

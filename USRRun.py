@@ -38,10 +38,6 @@ def initSpark():
         .builder \
         .appName("Test Etienne JOB") \
         .master("spark://"+LOCAL_IP+":7077") \
-        .config("spark.executor.cores", 4) \
-        .config("spark.cores.max", 32) \
-        .config("spark.python.worker.memory", "8g") \
-        .config("spark.executor.memory", "5g") \
         .config("spark.executor.heartbeatInterval", "100s") \
         .config("spark.network.timeout", "400s") \
         .config("spark.executorEnv.SPARK_LOCAL_IP", LOCAL_IP) \
@@ -65,15 +61,20 @@ molfiles = [[homeDir+"/Conformers/Adenosine A2a receptor (GPCR)/", "actives_fina
 
 
 def getEnrichmentFactor(threshold, ds, sort_by="prob", truth="truth"):
+
+
     sorted_ds = ds.sort_values(by=sort_by, ascending=False)
     # print(sorted_ds)
+
     top_thresh = sorted_ds.iloc[0:int(threshold * len(sorted_ds))]
     # print(top_thresh)
-
+    
     num_actives = sum(top_thresh[truth])
     #print("Number of actives found in top ", (threshold * 100), "%=", num_actives)
-    #print("Number of actives expected =", (float(sum(sorted_ds[truth])) / len(sorted_ds)) * len(top_thresh))
-    ef = float(num_actives) / len(top_thresh) / (float(sum(sorted_ds[truth])) / len(sorted_ds))
+    expected = (float(sum(sorted_ds[truth])) / len(sorted_ds)) * len(top_thresh)
+    #print("Number of actives expected =", expected)
+    ef = float(num_actives)/expected
+    #ef = float(num_actives) / len(top_thresh) / (float(sum(sorted_ds[truth])) / len(sorted_ds))
 
     return ef
 
@@ -104,24 +105,28 @@ def plotSimROC(mol_ds, results, fileName):
     # print(simresults.shape)
     plotROCCurve(simresults[:, 1], simresults[:, 0], molfiles[0][0], fileName)
 
-    ef = [getEnrichmentFactor(0.01, pd.DataFrame(data=list(zip(r, labels)), columns=("sim", "truth")), sort_by="sim",
-                              truth="truth") for r in results]
-    print(ef)
-    ef_mean = np.mean(ef)
+    thresholds = [0.01, 0.05]
 
-    # sim_pd = pd.DataFrame(data=simresults, columns=("sim", "truth"))
-    # print(getEnrichmentFactor(0.01, sim_pd, sort_by="sim", truth="truth"))
-    print("Mean EF@1%=", ef_mean)
+    for threshold in thresholds:
+        ef = [getEnrichmentFactor(threshold, pd.DataFrame(data=list(zip(r, labels)), columns=("sim", "truth")), sort_by="sim",
+                              truth="truth") for r in results]
+    
+        print(ef)
+        ef_mean = np.mean(ef)
+
+        # sim_pd = pd.DataFrame(data=simresults, columns=("sim", "truth"))
+        # print(getEnrichmentFactor(0.01, sim_pd, sort_by="sim", truth="truth"))
+        print("Mean EF@"+str((threshold * 100))+"%=", ef_mean)
 
 numActives=1
 
-molNdx=1
+molNdx=0
 
 #(sim_ds, sim_paths) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="usr", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
 #(sim_es_ds, sim_paths_es) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="esh", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
 #(sim_es5_ds, sim_paths_es5) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="es5", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
 
-for molNdx in range(0, len(molfiles)):
+for molNdx in range(1, len(molfiles)):
 
     print("Processing "+molfiles[molNdx][0])
     print("Processing USR")

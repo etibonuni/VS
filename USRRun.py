@@ -108,15 +108,16 @@ def plotSimROC(mol_ds, results, fileName):
     thresholds = [0.01, 0.05]
 
     for threshold in thresholds:
-        ef = [getEnrichmentFactor(threshold, pd.DataFrame(data=list(zip(r, labels)), columns=("sim", "truth")), sort_by="sim",
-                              truth="truth") for r in results]
+#        ef = [getEnrichmentFactor(threshold, pd.DataFrame(data=list(zip(r, labels)), columns=("sim", "truth")), sort_by="sim",
+#                              truth="truth") for r in results]
     
-        print(ef)
-        ef_mean = np.mean(ef)
+#        print(ef)
+#        ef_mean = np.mean(ef)
 
+        ef = getEnrichmentFactor(threshold, pd.DataFrame(data=simresults, columns=("sim", "truth")), sort_by="sim", truth="truth")
         # sim_pd = pd.DataFrame(data=simresults, columns=("sim", "truth"))
         # print(getEnrichmentFactor(0.01, sim_pd, sort_by="sim", truth="truth"))
-        print("Mean EF@"+str((threshold * 100))+"%=", ef_mean)
+        print("Mean EF@"+str((threshold * 100))+"%=", ef)
 
 numActives=1
 

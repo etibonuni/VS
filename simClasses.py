@@ -336,39 +336,15 @@ class USRMoleculeSim(MoleculeSimilarity):
     def runSparkScreening(self, sc):
         #activeRange = sc.range(0, sum([self.conformers[x][2] for x in range(0, len(self.conformers))]))
 
-        actives = [np.array(self.conformers[i][0][:,0:self.numcols]) for i in range(0, len(self.conformers)) if self.conformers[i][2]==True]
+         actives = [np.array(self.conformers[i][0][:,0:self.numcols]) for i in range(0, len(self.conformers)) if self.conformers[i][2]==True]
 
-        # print(activeRange.collect())
-        # activeRange=sc.range(0,3,numSlices=2)
-        # Split the actives into batches of 100 in order to prevent memory problems with the Spark cluster
-        candidates = sc.parallelize(
-            [(i, np.array(self.conformers[i][0][:, 0:self.numcols])) for i in range(0, len(self.conformers))])
+         candidates = sc.parallelize( [(i, np.array(self.conformers[i][0][:, 0:self.numcols])) for i in range(0, len(self.conformers))])
 
-        candidates = candidates.repartition(len(actives))
+         candidates = candidates.repartition(len(actives))
 
-        batchSize=5
-        startNdx=0
-
-        results = None
-        while True:
-            actives_bc = sc.broadcast(actives[startNdx:min(startNdx+batchSize, len(actives))])
-
-
-            c = candidates.map(lambda x: self.doSim(x, actives_bc)).sortByKey(ascending=True).values().collect()
-            if results is None:
-                results = c
-            else:
-                results = np.append(results, c, axis=1)
-
-            startNdx = startNdx + batchSize
-
-            if startNdx >= len(actives):
-                break;
-
-        return results
-
-        #return activeRange.map(lambda x: self.doSim(x, simObj_bc)).collect()
-
+         actives_bc = sc.broadcast(actives)
+                                                                                
+         return candidates.map(lambda x: self.doSim(x, actives_bc)).sortByKey(ascending=True).values().collect()
 
 class USR_MNPSim(MoleculeSimilarity):
     def __init__(self, conformers, paths):

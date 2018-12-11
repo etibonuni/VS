@@ -38,10 +38,11 @@ def initSpark():
         .builder \
         .appName("Test Etienne JOB") \
         .master("spark://"+LOCAL_IP+":7077") \
-        .config("spark.executor.heartbeatInterval", "100s") \
-        .config("spark.network.timeout", "400s") \
+        .config("spark.cores.max", 22) \
         .config("spark.executorEnv.SPARK_LOCAL_IP", LOCAL_IP) \
         .getOrCreate()
+#        .config("spark.executor.heartbeatInterval", "100s") \
+#        .config("spark.network.timeout", "400s") \
     
     sc = spark.sparkContext
     sc.addFile("simClasses.py")
@@ -108,16 +109,16 @@ def plotSimROC(mol_ds, results, fileName):
     thresholds = [0.01, 0.05]
 
     for threshold in thresholds:
-#        ef = [getEnrichmentFactor(threshold, pd.DataFrame(data=list(zip(r, labels)), columns=("sim", "truth")), sort_by="sim",
-#                              truth="truth") for r in results]
+        ef = [getEnrichmentFactor(threshold, pd.DataFrame(data=list(zip(r, labels)), columns=("sim", "truth")), sort_by="sim",
+                              truth="truth") for r in results]
     
 #        print(ef)
-#        ef_mean = np.mean(ef)
+        ef_mean = np.mean(ef)
 
-        ef = getEnrichmentFactor(threshold, pd.DataFrame(data=simresults, columns=("sim", "truth")), sort_by="sim", truth="truth")
+#        ef = getEnrichmentFactor(threshold, pd.DataFrame(data=simresults, columns=("sim", "truth")), sort_by="sim", truth="truth")
         # sim_pd = pd.DataFrame(data=simresults, columns=("sim", "truth"))
         # print(getEnrichmentFactor(0.01, sim_pd, sort_by="sim", truth="truth"))
-        print("Mean EF@"+str((threshold * 100))+"%=", ef)
+        print("Mean EF@"+str((threshold * 100))+"%=", ef_mean)
 
 numActives=1
 
@@ -127,7 +128,7 @@ molNdx=0
 #(sim_es_ds, sim_paths_es) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="esh", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
 #(sim_es5_ds, sim_paths_es5) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="es5", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
 
-for molNdx in range(1, len(molfiles)):
+for molNdx in range(0, len(molfiles)):
 
     print("Processing "+molfiles[molNdx][0])
     print("Processing USR")

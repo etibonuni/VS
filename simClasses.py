@@ -15,7 +15,7 @@ from glob import glob
 from random import shuffle
 import os
 from sklearn.manifold import TSNE
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 def getExpectedLikelihood(mu1, sigma1, mu2, sigma2):
     mu_1 = np.matrix(mu1)
@@ -330,7 +330,7 @@ class USRMoleculeSim(MoleculeSimilarity):
     def doSim(self, candidate, actives_bc):
         #resultsMol = [simObj_bc.value.getSim(templateNdx, molNdx) for molNdx in range(0, len(simObj_bc.value.conformers))]
 
-        resultsMol = (candidate[0], [np.max(manhattanSim(candidate[1], actives_bc.value[i])) for i in range(0, len(actives_bc.value))])
+        resultsMol = [np.max(manhattanSim(candidate[1], actives_bc.value[i])) for i in range(0, len(actives_bc.value))]
         return resultsMol
 
     def runSparkScreening(self, sc):
@@ -338,13 +338,26 @@ class USRMoleculeSim(MoleculeSimilarity):
 
          actives = [np.array(self.conformers[i][0][:,0:self.numcols]) for i in range(0, len(self.conformers)) if self.conformers[i][2]==True]
 
-         candidates = sc.parallelize( [(i, np.array(self.conformers[i][0][:, 0:self.numcols])) for i in range(0, len(self.conformers))])
+         candidates = sc.parallelize( [(i, np.array(self.conformers[i][0][:, 0:self.numcols])) for i in range(0, len(self.conformers))], numSlices=len(actives)*10)
 
-         candidates = candidates.repartition(len(actives))
+         #candidates = candidates.repartition(len(actives))
 
          actives_bc = sc.broadcast(actives)
-                                                                                
-         return candidates.map(lambda x: self.doSim(x, actives_bc)).sortByKey(ascending=True).values().collect()
+
+         c = candidates.map(lambda x: self.doSim(x, actives_bc))
+         
+         # Sort in Spark causes crash -> perform sorting locally
+         #c2 = c.sortByKey(ascending=True)
+
+         #c3 = c2.values()
+         #c = c.collect()
+
+
+         #order = [c[i][0] for i in range(0, len(c))]
+
+         #v = [c[i][1] for i in range(0, len(c))]
+
+         return c.collect()
 
 class USR_MNPSim(MoleculeSimilarity):
     def __init__(self, conformers, paths):

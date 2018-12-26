@@ -38,10 +38,11 @@ def get_immediate_subdirectories(a_dir):
             if os.path.isdir(os.path.join(a_dir, name))]
 
 
-homeDir = "/home/etienne/MScAI/dissertation"
-#homeDir = "/home/ubuntu/data_vol/projects/dissertation"
-molfiles = get_immediate_subdirectories(homeDir)
-
+#homeDir = "/home/etienne/MScAI/dissertation"
+homeDir = "/home/ubuntu/data_vol/projects/dissertation/Conformers"
+#molfiles = get_immediate_subdirectories(homeDir)
+molfiles = [[homeDir+"/"+x+"/",x] for x in get_immediate_subdirectories(homeDir)]
+print(molfiles)
 # molfiles = [[homeDir+"/Conformers/Adenosine A2a receptor (GPCR)/", "actives_final.ism", "decoys_final.ism"],
 #             [homeDir+"/Conformers/Progesterone Receptor/", "actives_final.ism", "decoys_final.ism"],
 #             [homeDir+"/Conformers/Neuraminidase/", "actives_final.ism", "decoys_final.ism"],
@@ -117,7 +118,7 @@ molNdx=0
 #(sim_es_ds, sim_paths_es) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="esh", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
 #(sim_es5_ds, sim_paths_es5) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="es5", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
 
-for molNdx in range(1, len(molfiles)):
+for molNdx in range(0, len(molfiles)):
 
     print("Processing "+molfiles[molNdx][0])
     print("Processing USR")
@@ -126,7 +127,7 @@ for molNdx in range(1, len(molfiles)):
     simobj = scls.USRMoleculeSim(sim_ds, sim_paths)
     usr_results = np.array(simobj.runSparkScreening(sc)).transpose()
     sc.stop()
-    plotSimROC(sim_ds, usr_results, "usr_plot_"+str(molNdx)+".pdf")
+    plotSimROC(sim_ds, usr_results, "usr_plot_"+molfiles[molNdx][1]+".pdf")
     
     print("Processing Electroshape 4-d")
     sc = initSpark()
@@ -134,7 +135,7 @@ for molNdx in range(1, len(molfiles)):
     simobj_es = scls.USRMoleculeSim(sim_es_ds, sim_paths_es)
     usr_results_esh = np.array(simobj_es.runSparkScreening(sc)).transpose()
     sc.stop()
-    plotSimROC(sim_es_ds, usr_results_esh, "esh_plot_"+str(molNdx)+".pdf")
+    plotSimROC(sim_es_ds, usr_results_esh, "esh_plot_"+molfiles[molNdx][1]+".pdf")
     
     print("Processing Electroshape 5-d")
     sc = initSpark()
@@ -142,5 +143,5 @@ for molNdx in range(1, len(molfiles)):
     simobj_es5 = scls.USRMoleculeSim(sim_es5_ds, sim_paths_es5)
     usr_results_es5 = np.array(simobj_es5.runSparkScreening(sc)).transpose()
     sc.stop()
-    plotSimROC(sim_es5_ds, usr_results_es5, "es5_plot_"+str(molNdx)+".pdf")
+    plotSimROC(sim_es5_ds, usr_results_es5, "es5_plot_"+molfiles[molNdx][1]+".pdf")
 

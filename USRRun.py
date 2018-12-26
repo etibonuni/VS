@@ -8,7 +8,7 @@ from sklearn.metrics import roc_curve, auc
 import matplotlib
 matplotlib.use('Agg') # Must be before importing matplotlib.pyplot or pylab!
 import matplotlib.pyplot as plt
-
+import evaluation as eval
 import simClasses as scls
 
 findspark.init()
@@ -38,7 +38,7 @@ def get_immediate_subdirectories(a_dir):
             if os.path.isdir(os.path.join(a_dir, name))]
 
 
-#homeDir = "/home/etienne/MScAI/dissertation"
+#homeDir = "/home/etienne/MScAI/dissertation/Conformers"
 homeDir = "/home/ubuntu/data_vol/projects/dissertation/Conformers"
 #molfiles = get_immediate_subdirectories(homeDir)
 molfiles = [[homeDir+"/"+x+"/",x] for x in get_immediate_subdirectories(homeDir)]
@@ -110,7 +110,7 @@ def plotSimROC(mol_ds, results, fileName):
         # print(getEnrichmentFactor(0.01, sim_pd, sort_by="sim", truth="truth"))
         print("Mean EF@"+str((threshold * 100))+"%=", ef_mean)
 
-numActives=1
+numActives=3
 
 molNdx=0
 
@@ -118,8 +118,9 @@ molNdx=0
 #(sim_es_ds, sim_paths_es) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="esh", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
 #(sim_es5_ds, sim_paths_es5) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="es5", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
 
+results = []
 for molNdx in range(0, len(molfiles)):
-
+    molName = molfiles[molNdx][1]
     print("Processing "+molfiles[molNdx][0])
     print("Processing USR")
     sc = initSpark()
@@ -127,21 +128,34 @@ for molNdx in range(0, len(molfiles)):
     simobj = scls.USRMoleculeSim(sim_ds, sim_paths)
     usr_results = np.array(simobj.runSparkScreening(sc)).transpose()
     sc.stop()
-    plotSimROC(sim_ds, usr_results, "usr_plot_"+molfiles[molNdx][1]+".pdf")
-    
+    #plotSimROC(sim_ds, usr_results, "usr_plot_"+molfiles[molNdx][1]+".pdf")
+    (auc_usr, mean_ef_usr) = eval.plotSimROC([l[2] for l in sim_ds], usr_results,
+                                     molName + "USR results",
+                                     "usr_plot_"+molName + ".pdf")
+
     print("Processing Electroshape 4-d")
     sc = initSpark()
     (sim_es_ds, sim_paths_es) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="esh", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
     simobj_es = scls.USRMoleculeSim(sim_es_ds, sim_paths_es)
     usr_results_esh = np.array(simobj_es.runSparkScreening(sc)).transpose()
     sc.stop()
-    plotSimROC(sim_es_ds, usr_results_esh, "esh_plot_"+molfiles[molNdx][1]+".pdf")
-    
+    #plotSimROC(sim_es_ds, usr_results_esh, "esh_plot_"+molfiles[molNdx][1]+".pdf")
+    (auc_esh, mean_ef_esh) = eval.plotSimROC([l[2] for l in sim_ds], usr_results_esh,
+                                     molName + "ElectroShape 4-d results",
+                                     "esh_plot_"+molName + ".pdf")
+
     print("Processing Electroshape 5-d")
     sc = initSpark()
     (sim_es5_ds, sim_paths_es5) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="es5", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
     simobj_es5 = scls.USRMoleculeSim(sim_es5_ds, sim_paths_es5)
     usr_results_es5 = np.array(simobj_es5.runSparkScreening(sc)).transpose()
     sc.stop()
-    plotSimROC(sim_es5_ds, usr_results_es5, "es5_plot_"+molfiles[molNdx][1]+".pdf")
+    #plotSimROC(sim_es5_ds, usr_results_es5, "es5_plot_"+molfiles[molNdx][1]+".pdf")
+    (auc_es5, mean_ef_es5) = eval.plotSimROC([l[2] for l in sim_ds], usr_results_es5,
+                                     molName + "ElectroShape 5-d results",
+                                     "es5_plot_"+molName + ".pdf")
 
+    results.append([molName, auc_usr, mean_ef_usr, auc_esh, mean_ef_esh, auc_es5, mean_ef_es5])
+
+print("Results:")
+print(results)

@@ -1,34 +1,17 @@
-from rdkit import Chem
-from rdkit.Chem import AllChem
-from rdkit.Chem import rdMolDescriptors as rdmd
-from rdkit import rdBase
-from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
-import numpy as np
-import pandas as pd
-from numpy.linalg import inv, det
-from scipy.stats import norm
-from sklearn.metrics import f1_score
-import math
-import pickle
-import conformer_utils as cu
-from glob import glob
-from random import shuffle
 import os
-from sklearn.manifold import TSNE
-from itertools import chain
+import numpy as np
+import conformer_utils as cu
 import pandas as pd
 import findspark
-
 from sklearn.metrics import roc_curve, auc
+
 import matplotlib
 matplotlib.use('Agg') # Must be before importing matplotlib.pyplot or pylab!
-
 import matplotlib.pyplot as plt
 
 import simClasses as scls
-findspark.init()
 
-from pyspark import SparkContext, SparkConf
+findspark.init()
 from pyspark.sql import SparkSession
 
 def initSpark():
@@ -50,15 +33,21 @@ def initSpark():
     
     return sc
 
+def get_immediate_subdirectories(a_dir):
+    return [name for name in os.listdir(a_dir)
+            if os.path.isdir(os.path.join(a_dir, name))]
 
-#homeDir = "/home/etienne/MScAI/dissertation"
-homeDir = "/home/ubuntu/data_vol/projects/dissertation"
-molfiles = [[homeDir+"/Conformers/Adenosine A2a receptor (GPCR)/", "actives_final.ism", "decoys_final.ism"],
-            [homeDir+"/Conformers/Progesterone Receptor/", "actives_final.ism", "decoys_final.ism"],
-            [homeDir+"/Conformers/Neuraminidase/", "actives_final.ism", "decoys_final.ism"],
-            [homeDir+"/Conformers/Thymidine kinase/", "actives_final.ism", "decoys_final.ism"],
-            [homeDir+"/Conformers/Leukotriene A4 hydrolase (Protease)/", "actives_final.ism", "decoys_final.ism"],
-            [homeDir+"/Conformers/HIVPR/", "actives_final.ism", "decoys_final.ism"]]
+
+homeDir = "/home/etienne/MScAI/dissertation"
+#homeDir = "/home/ubuntu/data_vol/projects/dissertation"
+molfiles = get_immediate_subdirectories(homeDir)
+
+# molfiles = [[homeDir+"/Conformers/Adenosine A2a receptor (GPCR)/", "actives_final.ism", "decoys_final.ism"],
+#             [homeDir+"/Conformers/Progesterone Receptor/", "actives_final.ism", "decoys_final.ism"],
+#             [homeDir+"/Conformers/Neuraminidase/", "actives_final.ism", "decoys_final.ism"],
+#             [homeDir+"/Conformers/Thymidine kinase/", "actives_final.ism", "decoys_final.ism"],
+#             [homeDir+"/Conformers/Leukotriene A4 hydrolase (Protease)/", "actives_final.ism", "decoys_final.ism"],
+#             [homeDir+"/Conformers/HIVPR/", "actives_final.ism", "decoys_final.ism"]]
 
 
 def getEnrichmentFactor(threshold, ds, sort_by="prob", truth="truth"):
@@ -128,7 +117,7 @@ molNdx=0
 #(sim_es_ds, sim_paths_es) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="esh", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
 #(sim_es5_ds, sim_paths_es5) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="es5", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
 
-for molNdx in range(0, len(molfiles)):
+for molNdx in range(1, len(molfiles)):
 
     print("Processing "+molfiles[molNdx][0])
     print("Processing USR")

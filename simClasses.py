@@ -336,9 +336,9 @@ class USRMoleculeSim(MoleculeSimilarity):
     def runSparkScreening(self, sc):
         #activeRange = sc.range(0, sum([self.conformers[x][2] for x in range(0, len(self.conformers))]))
 
-         actives = [np.array(self.conformers[i][0][:,0:self.numcols]) for i in range(0, len(self.conformers)) if self.conformers[i][2]==True]
+         actives = [np.array(self.conformers[i][0].iloc[:,0:self.numcols]) for i in range(0, len(self.conformers)) if self.conformers[i][2]==True]
 
-         candidates = sc.parallelize( [(i, np.array(self.conformers[i][0][:, 0:self.numcols])) for i in range(0, len(self.conformers))], numSlices=len(actives)*10)
+         candidates = sc.parallelize( [(i, np.array(self.conformers[i][0].iloc[:, 0:self.numcols])) for i in range(0, len(self.conformers))], numSlices=len(actives)*10)
 
          #candidates = candidates.repartition(len(actives))
 

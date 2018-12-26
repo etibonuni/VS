@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 from glob import glob
 from random import shuffle
+import random
+
 
 # Returns the number of active and decoy molecules present in the given folder
 def getDescriptorStats(path):
@@ -101,7 +103,7 @@ def loadDescriptors(path, num_actives, active_decoy_ratio=1, dtype="usr", select
             paths.append(fpath)
 
             mol = loadDescriptorFile(fpath, True)
-            records.append((mol[0].values.astype(float), mol[1], True))
+            records.append((mol[0], mol[1], True))
             i += 1
 
         numToLoad = numToLoad + min(num_decoys, len(decoy_filenames))
@@ -118,7 +120,7 @@ def loadDescriptors(path, num_actives, active_decoy_ratio=1, dtype="usr", select
             paths.append(fpath)
 
             mol = loadDescriptorFile(fpath, False)
-            records.append((mol[0].values.astype(float), mol[1], False))
+            records.append((mol[0], mol[1], False))
 
             i += 1
     else:
@@ -127,7 +129,7 @@ def loadDescriptors(path, num_actives, active_decoy_ratio=1, dtype="usr", select
             shuffle(decoy_filenames)
 
             numToLoad = min(num_actives, len(active_filenames))
-            print("numToLoad=", numToLoad)
+
             i = 0
             while (len(records) < numToLoad) and (i < len(active_filenames)):
                 fpath = active_filenames[i]
@@ -138,12 +140,11 @@ def loadDescriptors(path, num_actives, active_decoy_ratio=1, dtype="usr", select
                 paths.append(fpath)
 
                 mol = loadDescriptorFile(fpath, True)
-                records.append((mol[0].values.astype(float), mol[1], True))
+                records.append((mol[0], mol[1], True))
 
                 i += 1
 
             numToLoad = numToLoad + min(num_decoys, len(decoy_filenames))
-            print("numToLoad=", numToLoad)
 
             # i = len(active_filenames)
             i = 0
@@ -156,7 +157,7 @@ def loadDescriptors(path, num_actives, active_decoy_ratio=1, dtype="usr", select
                 paths.append(fpath)
 
                 mol = loadDescriptorFile(fpath, False)
-                records.append((mol[0].values.astype(float), mol[1], False))
+                records.append((mol[0], mol[1], False))
 
                 i += 1
         else:
@@ -168,8 +169,86 @@ def loadDescriptors(path, num_actives, active_decoy_ratio=1, dtype="usr", select
             if recs is None:
                 recs = mol
             else:
-                recs = recs.append(mol)
+                recs = recs.append(mol)#np.concatenate((recs, mol))
 
         return (recs, paths)
     else:
         return (records, paths)
+
+
+def takePortion(records, num_to_take, selection_policy="SEQUENTIAL", return_type="SEPARATE", exclusion_list=None):
+
+    if num_to_take <= 1:
+        num_to_take = len(records) * num_to_take
+
+    sel_range = set(range(0, len(records)))
+    if (exclusion_list is not None) and (len(exclusion_list)>0):
+        #sel_range = [x for x in sel_range if x not in exclusion_list]
+        sel_range = sel_range-exclusion_list
+
+    if selection_policy=="SEQUENTIAL":
+        sel_range = [sel_range[x] for x in range(0, num_to_take)]
+    elif selection_policy=="RANDOM":
+        sel_range = set(np.random.choice(list(sel_range), size=int(num_to_take), replace=False))
+
+    selection = [records[x] for x in sel_range]
+
+    if return_type=="LUMPED":
+        recs = None
+        for [mol, rot, label] in records:
+            if recs is None:
+                recs = mol
+            else:
+                recs = recs.append(mol)#np.concatenate((recs, mol))
+
+        return (recs, sel_range)
+
+    return (selection, sel_range)
+
+def split(records, folds, policy="RANDOM"):
+    recs_per_fold = int(len(records)/folds)
+
+    if policy=="RANDOM":
+        excl = []
+        recs = []
+        excl2 = set()
+        for fold in range(0, folds):
+            (r, i) = takePortion(records, recs_per_fold, selection_policy=policy, return_type="SEPARATE", exclusion_list=excl2)
+            recs.append(r)
+            excl.append(i)
+            excl2.update(i)
+
+        return (recs, excl)
+    elif policy=="SEQUENTIAL":
+        startNdx=0
+        recs=[]
+        excl = []
+
+        for fold in range(0, folds):
+            recs.append(records[startNdx:startNdx+recs_per_fold])
+            excl.append(range(startNdx, startNdx+recs_per_fold))
+
+            startNdx = startNdx+recs_per_fold
+
+        return (recs, excl)
+
+def lumpRecords(records):
+    recs = None
+    for [mol, rot, label] in records:
+        if recs is None:
+            recs = mol
+        else:
+            recs = recs.append(mol)  # np.concatenate((recs, mol))
+
+    return recs
+
+def joinDataframes(record_list):
+    recs = None
+
+    for rec in record_list:
+        if recs is None:
+            recs = rec
+        else:
+            recs = recs.append(rec)
+
+    return recs

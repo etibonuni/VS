@@ -136,6 +136,8 @@ for molNdx in range(0, len(molfiles)):
                                          "usr_plot_"+molName + ".pdf")
     except:
         print("Error processing USR for " + molfiles[molNdx][1])
+        auc_usr=0
+        mean_ef_usr=0
 
     try:
         print("Processing Electroshape 4-d")
@@ -150,6 +152,8 @@ for molNdx in range(0, len(molfiles)):
                                          "esh_plot_"+molName + ".pdf")
     except:
         print("Error processing Electroshape 4-d for " + molfiles[molNdx][1])
+        auc_esh=0
+        mean_ef_esh=0
 
     try:
         print("Processing Electroshape 5-d")
@@ -164,6 +168,8 @@ for molNdx in range(0, len(molfiles)):
                                          "es5_plot_"+molName + ".pdf")
     except:
         print("Error processing Electroshape 5-d for " + molfiles[molNdx][1])
+        auc_es5=0
+        mean_ef_es5=0
 
     results.append([molName, auc_usr, mean_ef_usr, auc_esh, mean_ef_esh, auc_es5, mean_ef_es5])
     print("Results:")

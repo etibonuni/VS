@@ -120,42 +120,52 @@ molNdx=0
 
 results = []
 for molNdx in range(0, len(molfiles)):
+
     molName = molfiles[molNdx][1]
-    print("Processing "+molfiles[molNdx][0])
-    print("Processing USR")
-    sc = initSpark()
-    (sim_ds, sim_paths) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="usr", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
-    simobj = scls.USRMoleculeSim(sim_ds, sim_paths)
-    usr_results = np.array(simobj.runSparkScreening(sc)).transpose()
-    sc.stop()
-    #plotSimROC(sim_ds, usr_results, "usr_plot_"+molfiles[molNdx][1]+".pdf")
-    (auc_usr, mean_ef_usr) = eval.plotSimROC([l[2] for l in sim_ds], usr_results,
-                                     molName + "USR results",
-                                     "usr_plot_"+molName + ".pdf")
+    try:
+        print("Processing "+molfiles[molNdx][0])
+        print("Processing USR")
+        sc = initSpark()
+        (sim_ds, sim_paths) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="usr", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
+        simobj = scls.USRMoleculeSim(sim_ds, sim_paths)
+        usr_results = np.array(simobj.runSparkScreening(sc)).transpose()
+        sc.stop()
+        #plotSimROC(sim_ds, usr_results, "usr_plot_"+molfiles[molNdx][1]+".pdf")
+        (auc_usr, mean_ef_usr) = eval.plotSimROC([l[2] for l in sim_ds], usr_results,
+                                         molName + "USR results",
+                                         "usr_plot_"+molName + ".pdf")
+    except:
+        print("Error processing USR for " + molfiles[molNdx][1])
 
-    print("Processing Electroshape 4-d")
-    sc = initSpark()
-    (sim_es_ds, sim_paths_es) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="esh", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
-    simobj_es = scls.USRMoleculeSim(sim_es_ds, sim_paths_es)
-    usr_results_esh = np.array(simobj_es.runSparkScreening(sc)).transpose()
-    sc.stop()
-    #plotSimROC(sim_es_ds, usr_results_esh, "esh_plot_"+molfiles[molNdx][1]+".pdf")
-    (auc_esh, mean_ef_esh) = eval.plotSimROC([l[2] for l in sim_ds], usr_results_esh,
-                                     molName + "ElectroShape 4-d results",
-                                     "esh_plot_"+molName + ".pdf")
+    try:
+        print("Processing Electroshape 4-d")
+        sc = initSpark()
+        (sim_es_ds, sim_paths_es) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="esh", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
+        simobj_es = scls.USRMoleculeSim(sim_es_ds, sim_paths_es)
+        usr_results_esh = np.array(simobj_es.runSparkScreening(sc)).transpose()
+        sc.stop()
+        #plotSimROC(sim_es_ds, usr_results_esh, "esh_plot_"+molfiles[molNdx][1]+".pdf")
+        (auc_esh, mean_ef_esh) = eval.plotSimROC([l[2] for l in sim_ds], usr_results_esh,
+                                         molName + "ElectroShape 4-d results",
+                                         "esh_plot_"+molName + ".pdf")
+    except:
+        print("Error processing Electroshape 4-d for " + molfiles[molNdx][1])
 
-    print("Processing Electroshape 5-d")
-    sc = initSpark()
-    (sim_es5_ds, sim_paths_es5) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="es5", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
-    simobj_es5 = scls.USRMoleculeSim(sim_es5_ds, sim_paths_es5)
-    usr_results_es5 = np.array(simobj_es5.runSparkScreening(sc)).transpose()
-    sc.stop()
-    #plotSimROC(sim_es5_ds, usr_results_es5, "es5_plot_"+molfiles[molNdx][1]+".pdf")
-    (auc_es5, mean_ef_es5) = eval.plotSimROC([l[2] for l in sim_ds], usr_results_es5,
-                                     molName + "ElectroShape 5-d results",
-                                     "es5_plot_"+molName + ".pdf")
+    try:
+        print("Processing Electroshape 5-d")
+        sc = initSpark()
+        (sim_es5_ds, sim_paths_es5) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="es5", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
+        simobj_es5 = scls.USRMoleculeSim(sim_es5_ds, sim_paths_es5)
+        usr_results_es5 = np.array(simobj_es5.runSparkScreening(sc)).transpose()
+        sc.stop()
+        #plotSimROC(sim_es5_ds, usr_results_es5, "es5_plot_"+molfiles[molNdx][1]+".pdf")
+        (auc_es5, mean_ef_es5) = eval.plotSimROC([l[2] for l in sim_ds], usr_results_es5,
+                                         molName + "ElectroShape 5-d results",
+                                         "es5_plot_"+molName + ".pdf")
+    except:
+        print("Error processing Electroshape 5-d for " + molfiles[molNdx][1])
 
     results.append([molName, auc_usr, mean_ef_usr, auc_esh, mean_ef_esh, auc_es5, mean_ef_es5])
+    print("Results:")
 
-print("Results:")
 print(results)

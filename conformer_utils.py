@@ -14,19 +14,22 @@ def getDescriptorStats(path):
     
 # Load the USR descriptors in the given file into a Pandas dataframe, and add the "active" column set to the given boolean label
 def loadDescriptorFile(path, label):
-    # print(path)
-    f = open(path)
-    numRotatableBonds = int(f.readline())
-    # print("numRot=", numRotatableBonds)
+    try:
+        # print(path)
+        f = open(path)
+        numRotatableBonds = int(f.readline())
+        # print("numRot=", numRotatableBonds)
 
-    descs = pd.read_csv(f, header=None, index_col=0)
-    descs["active"] = [label] * len(descs.index)
+        descs = pd.read_csv(f, header=None, index_col=0)
+        descs["active"] = [label] * len(descs.index)
 
-    descs = descs.drop(labels=len(descs.columns) - 1, axis=1)
-    # print(len(descs.columns))
-    descs = descs.sort_values(by=len(descs.columns) - 1, ascending=True)
+        descs = descs.drop(labels=len(descs.columns) - 1, axis=1)
+        # print(len(descs.columns))
+        descs = descs.sort_values(by=len(descs.columns) - 1, ascending=True)
 
-    return (descs, numRotatableBonds)
+        return (descs, numRotatableBonds)
+    except:
+        return (None, 0)
 
 def checkMissing(path, dtype):
     missing_actives=list()
@@ -103,7 +106,9 @@ def loadDescriptors(path, num_actives, active_decoy_ratio=1, dtype="usr", select
             paths.append(fpath)
 
             mol = loadDescriptorFile(fpath, True)
-            records.append((mol[0], mol[1], True))
+            if mol[0] is not None:
+                records.append((mol[0], mol[1], True))
+
             i += 1
 
         numToLoad = numToLoad + min(num_decoys, len(decoy_filenames))
@@ -120,7 +125,9 @@ def loadDescriptors(path, num_actives, active_decoy_ratio=1, dtype="usr", select
             paths.append(fpath)
 
             mol = loadDescriptorFile(fpath, False)
-            records.append((mol[0], mol[1], False))
+
+            if mol[0] is not None:
+                records.append((mol[0], mol[1], False))
 
             i += 1
     else:
@@ -140,7 +147,9 @@ def loadDescriptors(path, num_actives, active_decoy_ratio=1, dtype="usr", select
                 paths.append(fpath)
 
                 mol = loadDescriptorFile(fpath, True)
-                records.append((mol[0], mol[1], True))
+
+                if mol[0] is not None:
+                    records.append((mol[0], mol[1], True))
 
                 i += 1
 
@@ -157,7 +166,9 @@ def loadDescriptors(path, num_actives, active_decoy_ratio=1, dtype="usr", select
                 paths.append(fpath)
 
                 mol = loadDescriptorFile(fpath, False)
-                records.append((mol[0], mol[1], False))
+
+                if mol[0] is not None:
+                    records.append((mol[0], mol[1], False))
 
                 i += 1
         else:

@@ -96,7 +96,7 @@ def loadDescriptors(path, num_actives, active_decoy_ratio=1, dtype="usr", select
 
         i = 0
 
-        while len(records) < numToLoad:
+        while (len(records) < numToLoad) and (i<len(active_filenames)):
             #fpath = path + "active_mol_" + str(i) + "." + dtype
             fpath = active_filenames[sortedNdx_actives[i]]
             if (exclusion_list is not None) and (fpath in exclusion_list):
@@ -115,7 +115,7 @@ def loadDescriptors(path, num_actives, active_decoy_ratio=1, dtype="usr", select
         #i = len(active_filenames)
         sortedNdx_decoys = argsort(decoy_filenames)
         i=0
-        while len(records) < numToLoad:
+        while (len(records) < numToLoad) and (i<len(decoy_filenames)):
             #fpath = path + "decoy_mol_" + str(i) + "." + dtype
             fpath = decoy_filenames[sortedNdx_decoys[i]]
             if (exclusion_list is not None) and (fpath in exclusion_list):

@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.metrics import roc_curve, auc
+import scipy.stats as ss
 import matplotlib
 #matplotlib.use('Agg') # Must be before importing matplotlib.pyplot or pylab!
 import matplotlib.pyplot as plt
@@ -57,7 +58,53 @@ def plotSimROC(truth, results, title, fileName):
     # print(simresults.shape)
     auc = plotROCCurve(simresults[:, 1], simresults[:, 0], title, fileName)
 
-    thresholds = [0.01, 0.05]
+    # thresholds = [0.01, 0.05]
+    # mean_efs={}
+    # for threshold in thresholds:
+    #     ef = [getEnrichmentFactor(threshold, pd.DataFrame(data=list(zip(r, truth)), columns=("sim", "truth")),
+    #                               sort_by="sim",
+    #                               truth="truth") for r in results]
+    #
+    #     #        print(ef)
+    #     ef_mean = np.mean(ef)
+    #     mean_efs[threshold] = ef_mean
+    #     #        ef = getEnrichmentFactor(threshold, pd.DataFrame(data=simresults, columns=("sim", "truth")), sort_by="sim", truth="truth")
+    #     # sim_pd = pd.DataFrame(data=simresults, columns=("sim", "truth"))
+    #     # print(getEnrichmentFactor(0.01, sim_pd, sort_by="sim", truth="truth"))
+    #     print("Mean EF@" + str((threshold * 100)) + "%=", ef_mean)
+    #
+    # return (auc, mean_efs)
+
+    return auc
+
+def plotRankROC(truth, results, title, fileName):
+    #labels = [l[2] for l in mol_ds]
+
+    rankresults = np.concatenate([np.array(list(zip(ss.rankdata(r), truth))) for r in results])
+    # print(simresults.shape)
+    auc = plotROCCurve(rankresults[:, 1], rankresults[:, 0], title, fileName)
+
+    # thresholds = [0.01, 0.05]
+    # mean_efs={}
+    # for threshold in thresholds:
+    #     ef = [getEnrichmentFactor(threshold, pd.DataFrame(data=list(zip(r, truth)), columns=("sim", "truth")),
+    #                               sort_by="sim",
+    #                               truth="truth") for r in results]
+    #
+    #     #        print(ef)
+    #     ef_mean = np.mean(ef)
+    #     mean_efs[threshold] = ef_mean
+    #     #        ef = getEnrichmentFactor(threshold, pd.DataFrame(data=simresults, columns=("sim", "truth")), sort_by="sim", truth="truth")
+    #     # sim_pd = pd.DataFrame(data=simresults, columns=("sim", "truth"))
+    #     # print(getEnrichmentFactor(0.01, sim_pd, sort_by="sim", truth="truth"))
+    #     print("Mean EF@" + str((threshold * 100)) + "%=", ef_mean)
+    #
+    # return (auc, mean_efs)
+
+    return auc
+
+
+def getMeanEFs(truth, results, thresholds=[0.01, 0.05]):
     mean_efs={}
     for threshold in thresholds:
         ef = [getEnrichmentFactor(threshold, pd.DataFrame(data=list(zip(r, truth)), columns=("sim", "truth")),
@@ -72,4 +119,4 @@ def plotSimROC(truth, results, title, fileName):
         # print(getEnrichmentFactor(0.01, sim_pd, sort_by="sim", truth="truth"))
         print("Mean EF@" + str((threshold * 100)) + "%=", ef_mean)
 
-    return (auc, mean_efs)
+    return mean_efs

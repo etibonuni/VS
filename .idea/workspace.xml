@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="de6588df-a1d3-4c63-81e3-ee5d4e68217b" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/NN_sklearn_actives.py" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/USRRun.py" afterPath="$PROJECT_DIR$/USRRun.py" />
       <change beforePath="$PROJECT_DIR$/evaluation.py" afterPath="$PROJECT_DIR$/evaluation.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -27,7 +25,7 @@
         <entry file="file://$PROJECT_DIR$/evaluation.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="60">
-              <caret line="82" column="64" lean-forward="false" selection-start-line="82" selection-start-column="64" selection-end-line="82" selection-end-column="64" />
+              <caret line="31" column="67" lean-forward="false" selection-start-line="31" selection-start-column="67" selection-end-line="31" selection-end-column="67" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -124,7 +122,7 @@
       <file leaf-file-name="USRRun.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/USRRun.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="167">
+            <state relative-caret-position="-1635">
               <caret line="41" column="0" lean-forward="false" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
@@ -168,8 +166,8 @@
         <option value="$PROJECT_DIR$/GMM_sklearn_actives.py" />
         <option value="$PROJECT_DIR$/conformer_utils.py" />
         <option value="$PROJECT_DIR$/NN_sklearn_actives.py" />
-        <option value="$PROJECT_DIR$/evaluation.py" />
         <option value="$PROJECT_DIR$/USRRun.py" />
+        <option value="$PROJECT_DIR$/evaluation.py" />
       </list>
     </option>
   </component>
@@ -475,7 +473,14 @@
       <option name="project" value="LOCAL" />
       <updated>1546189986652</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Compute Rank ROC">
+      <created>1546384435966</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1546384435966</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -517,7 +522,8 @@
     <MESSAGE value="Optimisation" />
     <MESSAGE value="Add exception handling" />
     <MESSAGE value="Catch exceptions" />
-    <option name="LAST_COMMIT_MESSAGE" value="Catch exceptions" />
+    <MESSAGE value="Compute Rank ROC" />
+    <option name="LAST_COMMIT_MESSAGE" value="Compute Rank ROC" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1001,7 +1007,7 @@
     <entry file="file://$PROJECT_DIR$/evaluation.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
-          <caret line="82" column="64" lean-forward="false" selection-start-line="82" selection-start-column="64" selection-end-line="82" selection-end-column="64" />
+          <caret line="31" column="67" lean-forward="false" selection-start-line="31" selection-start-column="67" selection-end-line="31" selection-end-column="67" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
@@ -1010,7 +1016,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/USRRun.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="167">
+        <state relative-caret-position="-1635">
           <caret line="41" column="0" lean-forward="false" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />

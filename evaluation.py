@@ -29,7 +29,7 @@ def getEnrichmentFactor(threshold, ds, sort_by="prob", truth="truth"):
 
 # print(sim_ds[0][0])
 def plotROCCurve(truth, preds, label, fileName):
-    fpr, tpr, _ = roc_curve(truth.astype(int), preds)
+    fpr, tpr, _ = roc_curve(truth.astype(int), np.nan_to_num(preds))
 
     roc_auc = auc(fpr, tpr)
 

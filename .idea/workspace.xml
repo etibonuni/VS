@@ -3,7 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="de6588df-a1d3-4c63-81e3-ee5d4e68217b" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/evaluation.py" afterPath="$PROJECT_DIR$/evaluation.py" />
+      <change beforePath="$PROJECT_DIR$/GMM_sklearn_actives.py" afterPath="$PROJECT_DIR$/GMM_sklearn_actives.py" />
+      <change beforePath="$PROJECT_DIR$/NN_sklearn_actives.py" afterPath="$PROJECT_DIR$/NN_sklearn_actives.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -24,7 +25,7 @@
       <file leaf-file-name="evaluation.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/evaluation.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
+            <state relative-caret-position="0">
               <caret line="31" column="67" lean-forward="false" selection-start-line="31" selection-start-column="67" selection-end-line="31" selection-end-column="67" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
@@ -36,8 +37,8 @@
       <file leaf-file-name="conformer_utils.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/conformer_utils.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="274">
-              <caret line="113" column="65" lean-forward="false" selection-start-line="113" selection-start-column="65" selection-end-line="113" selection-end-column="65" />
+            <state relative-caret-position="3675">
+              <caret line="245" column="4" lean-forward="false" selection-start-line="245" selection-start-column="4" selection-end-line="245" selection-end-column="4" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -48,8 +49,8 @@
       <file leaf-file-name="NN_sklearn_actives.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/NN_sklearn_actives.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="389">
-              <caret line="97" column="36" lean-forward="false" selection-start-line="97" selection-start-column="36" selection-end-line="97" selection-end-column="36" />
+            <state relative-caret-position="375">
+              <caret line="132" column="40" lean-forward="false" selection-start-line="132" selection-start-column="40" selection-end-line="132" selection-end-column="40" />
               <folding>
                 <element signature="e#70#117#0" expanded="true" />
               </folding>
@@ -60,7 +61,7 @@
       <file leaf-file-name="series.py" pinned="false" current-in-tab="false">
         <entry file="file://$USER_HOME$/anaconda2/envs/rdkit3_6/lib/python3.6/site-packages/pandas/core/series.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="172">
+            <state relative-caret-position="8445">
               <caret line="640" column="0" lean-forward="false" selection-start-line="640" selection-start-column="0" selection-end-line="640" selection-end-column="0" />
               <folding />
             </state>
@@ -70,7 +71,7 @@
       <file leaf-file-name="generic.py" pinned="false" current-in-tab="false">
         <entry file="file://$USER_HOME$/anaconda2/envs/rdkit3_6/lib/python3.6/site-packages/pandas/core/generic.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="232">
+            <state relative-caret-position="64710">
               <caret line="4371" column="0" lean-forward="false" selection-start-line="4371" selection-start-column="0" selection-end-line="4371" selection-end-column="0" />
               <folding />
             </state>
@@ -80,28 +81,18 @@
       <file leaf-file-name="frame.py" pinned="false" current-in-tab="false">
         <entry file="file://$USER_HOME$/anaconda2/envs/rdkit3_6/lib/python3.6/site-packages/pandas/core/frame.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="352">
+            <state relative-caret-position="38700">
               <caret line="2670" column="0" lean-forward="false" selection-start-line="2670" selection-start-column="0" selection-end-line="2670" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="_pydev_execfile.py" pinned="false" current-in-tab="false">
-        <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/_pydev_imps/_pydev_execfile.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="GMM_sklearn_actives.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="GMM_sklearn_actives.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/GMM_sklearn_actives.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="204">
-              <caret line="141" column="0" lean-forward="true" selection-start-line="140" selection-start-column="4" selection-end-line="141" selection-end-column="0" />
+            <state relative-caret-position="316">
+              <caret line="157" column="72" lean-forward="false" selection-start-line="157" selection-start-column="72" selection-end-line="157" selection-end-column="72" />
               <folding>
                 <element signature="e#0#68#0" expanded="true" />
               </folding>
@@ -112,18 +103,18 @@
       <file leaf-file-name="codecs.py" pinned="false" current-in-tab="false">
         <entry file="file://$USER_HOME$/anaconda2/envs/rdkit3_6/lib/python3.6/codecs.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
+            <state relative-caret-position="4650">
               <caret line="310" column="0" lean-forward="false" selection-start-line="310" selection-start-column="0" selection-end-line="310" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="USRRun.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="USRRun.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/USRRun.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1635">
-              <caret line="41" column="0" lean-forward="false" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
+            <state relative-caret-position="-405">
+              <caret line="78" column="10" lean-forward="true" selection-start-line="78" selection-start-column="10" selection-end-line="78" selection-end-column="10" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -142,15 +133,15 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>molfiles</find>
       <find>loadDescriptors</find>
       <find>print</find>
       <find>train_d</find>
       <find>None</find>
       <find>mean</find>
-      <find>train_d</find>
-      <find>loadDescriptorFile</find>
       <find>mol_ds</find>
+      <find>loadDescriptorFile</find>
+      <find>molName</find>
+      <find>molfiles</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -163,11 +154,11 @@
         <option value="$PROJECT_DIR$/checkmissing.py" />
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/simClasses.py" />
-        <option value="$PROJECT_DIR$/GMM_sklearn_actives.py" />
         <option value="$PROJECT_DIR$/conformer_utils.py" />
-        <option value="$PROJECT_DIR$/NN_sklearn_actives.py" />
         <option value="$PROJECT_DIR$/USRRun.py" />
         <option value="$PROJECT_DIR$/evaluation.py" />
+        <option value="$PROJECT_DIR$/NN_sklearn_actives.py" />
+        <option value="$PROJECT_DIR$/GMM_sklearn_actives.py" />
       </list>
     </option>
   </component>
@@ -199,8 +190,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -208,15 +197,12 @@
               <item name="VS" type="b2602c69:ProjectViewProjectNode" />
               <item name="VS" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="VS" type="b2602c69:ProjectViewProjectNode" />
-              <item name="VS" type="462c0819:PsiDirectoryNode" />
-              <item name="test" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -243,7 +229,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.USRRun">
+  <component name="RunManager" selected="Python.GMM_sklearn_actives">
     <configuration name="GMM_sklearn_actives" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -367,9 +353,9 @@
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.USRRun" />
+        <item index="0" class="java.lang.String" itemvalue="Python.GMM_sklearn_actives" />
         <item index="1" class="java.lang.String" itemvalue="Python.NN_sklearn_actives" />
-        <item index="2" class="java.lang.String" itemvalue="Python.GMM_sklearn_actives" />
+        <item index="2" class="java.lang.String" itemvalue="Python.USRRun" />
         <item index="3" class="java.lang.String" itemvalue="Python.checkmissing" />
         <item index="4" class="java.lang.String" itemvalue="Python.conformer_utils" />
       </list>
@@ -480,7 +466,14 @@
       <option name="project" value="LOCAL" />
       <updated>1546384435966</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Compute Rank ROC">
+      <created>1546384782953</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1546384782953</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -488,18 +481,18 @@
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3361793" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" x="0" y="0" width="430" height="856" />
+      <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19316968" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" x="0" y="0" width="430" height="856" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.33443344" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32893288" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.51155114" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32893288" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1638207" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16542156" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="SciView" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39933994" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -560,7 +553,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/GMM_sklearn_actives.py</url>
-          <line>27</line>
+          <line>29</line>
           <option name="timeStamp" value="62" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -570,18 +563,8 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/GMM_sklearn_actives.py</url>
-          <line>86</line>
+          <line>88</line>
           <option name="timeStamp" value="70" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/NN_sklearn_actives.py</url>
-          <line>97</line>
-          <option name="timeStamp" value="72" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/NN_sklearn_actives.py</url>
-          <line>98</line>
-          <option name="timeStamp" value="73" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/USRRun.py</url>
@@ -622,7 +605,7 @@
         <state relative-caret-position="4560">
           <caret line="304" column="74" lean-forward="true" selection-start-line="304" selection-start-column="74" selection-end-line="304" selection-end-column="74" />
           <folding>
-            <element signature="e#0#22#0" expanded="true" />
+            <element signature="e#0#22#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -751,7 +734,7 @@
         <state relative-caret-position="314">
           <caret line="311" column="0" lean-forward="true" selection-start-line="311" selection-start-column="0" selection-end-line="311" selection-end-column="0" />
           <folding>
-            <element signature="e#0#22#0" expanded="true" />
+            <element signature="e#0#22#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -794,7 +777,7 @@
         <state relative-caret-position="4560">
           <caret line="304" column="74" lean-forward="true" selection-start-line="304" selection-start-column="74" selection-end-line="304" selection-end-column="74" />
           <folding>
-            <element signature="e#0#22#0" expanded="true" />
+            <element signature="e#0#22#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -890,16 +873,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/GMM_spark_actives.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="526">
-          <caret line="55" column="0" lean-forward="false" selection-start-line="55" selection-start-column="0" selection-end-line="62" selection-end-column="86" />
-          <folding>
-            <element signature="e#0#22#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/anaconda2/envs/rdkit3_6/lib/python3.6/site-packages/pandas/core/base.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="172">
@@ -913,7 +886,7 @@
         <state relative-caret-position="134">
           <caret line="345" column="0" lean-forward="false" selection-start-line="345" selection-start-column="0" selection-end-line="345" selection-end-column="0" />
           <folding>
-            <element signature="e#0#22#0" expanded="true" />
+            <element signature="e#0#22#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -922,35 +895,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="398">
           <caret line="1667" column="0" lean-forward="false" selection-start-line="1667" selection-start-column="0" selection-end-line="1667" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/RBM_sklearn_actives.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-180">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/GMM_sklearn_actives.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="141" column="0" lean-forward="true" selection-start-line="140" selection-start-column="4" selection-end-line="141" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#68#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/conformer_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="274">
-          <caret line="113" column="65" lean-forward="false" selection-start-line="113" selection-start-column="65" selection-end-line="113" selection-end-column="65" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -964,7 +908,7 @@
     </entry>
     <entry file="file://$USER_HOME$/anaconda2/envs/rdkit3_6/lib/python3.6/codecs.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
+        <state relative-caret-position="4650">
           <caret line="310" column="0" lean-forward="false" selection-start-line="310" selection-start-column="0" selection-end-line="310" selection-end-column="0" />
           <folding />
         </state>
@@ -972,7 +916,7 @@
     </entry>
     <entry file="file://$USER_HOME$/anaconda2/envs/rdkit3_6/lib/python3.6/site-packages/pandas/core/series.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="172">
+        <state relative-caret-position="8445">
           <caret line="640" column="0" lean-forward="false" selection-start-line="640" selection-start-column="0" selection-end-line="640" selection-end-column="0" />
           <folding />
         </state>
@@ -980,7 +924,7 @@
     </entry>
     <entry file="file://$USER_HOME$/anaconda2/envs/rdkit3_6/lib/python3.6/site-packages/pandas/core/frame.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="352">
+        <state relative-caret-position="38700">
           <caret line="2670" column="0" lean-forward="false" selection-start-line="2670" selection-start-column="0" selection-end-line="2670" selection-end-column="0" />
           <folding />
         </state>
@@ -988,25 +932,15 @@
     </entry>
     <entry file="file://$USER_HOME$/anaconda2/envs/rdkit3_6/lib/python3.6/site-packages/pandas/core/generic.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="232">
+        <state relative-caret-position="64710">
           <caret line="4371" column="0" lean-forward="false" selection-start-line="4371" selection-start-column="0" selection-end-line="4371" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/NN_sklearn_actives.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="389">
-          <caret line="97" column="36" lean-forward="false" selection-start-line="97" selection-start-column="36" selection-end-line="97" selection-end-column="36" />
-          <folding>
-            <element signature="e#70#117#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/evaluation.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
+        <state relative-caret-position="0">
           <caret line="31" column="67" lean-forward="false" selection-start-line="31" selection-start-column="67" selection-end-line="31" selection-end-column="67" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
@@ -1014,12 +948,58 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/conformer_utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3675">
+          <caret line="245" column="4" lean-forward="false" selection-start-line="245" selection-start-column="4" selection-end-line="245" selection-end-column="4" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RBM_sklearn_actives.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GMM_spark_actives.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="55" column="0" lean-forward="false" selection-start-line="55" selection-start-column="0" selection-end-line="62" selection-end-column="86" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/USRRun.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1635">
-          <caret line="41" column="0" lean-forward="false" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
+        <state relative-caret-position="-405">
+          <caret line="78" column="10" lean-forward="true" selection-start-line="78" selection-start-column="10" selection-end-line="78" selection-end-column="10" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/NN_sklearn_actives.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="375">
+          <caret line="132" column="40" lean-forward="false" selection-start-line="132" selection-start-column="40" selection-end-line="132" selection-end-column="40" />
+          <folding>
+            <element signature="e#70#117#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GMM_sklearn_actives.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="316">
+          <caret line="157" column="72" lean-forward="false" selection-start-line="157" selection-start-column="72" selection-end-line="157" selection-end-column="72" />
+          <folding>
+            <element signature="e#0#68#0" expanded="true" />
           </folding>
         </state>
       </provider>

@@ -19,10 +19,8 @@ def loadDescriptorFile(path, label):
         f = open(path)
         numRotatableBonds = int(f.readline())
         # print("numRot=", numRotatableBonds)
-
-        descs = pd.read_csv(f, header=None, index_col=0)
+        descs = pd.read_csv(f, header=None, index_col=0).fillna(0)
         descs["active"] = [label] * len(descs.index)
-
         descs = descs.drop(labels=len(descs.columns) - 1, axis=1)
         # print(len(descs.columns))
         descs = descs.sort_values(by=len(descs.columns) - 1, ascending=True)

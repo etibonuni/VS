@@ -6,8 +6,8 @@ import matplotlib
 #matplotlib.use('Agg') # Must be before importing matplotlib.pyplot or pylab!
 import matplotlib.pyplot as plt
 
-def getEnrichmentFactor(threshold, ds, sort_by="prob", truth="truth"):
-    sorted_ds = ds.sort_values(by=sort_by, ascending=False)
+def getEnrichmentFactor(threshold, ds, sort_by="prob", truth="truth", ascending=False):
+    sorted_ds = ds.sort_values(by=sort_by, ascending=ascending)
     # print(sorted_ds)
 
     top_thresh = sorted_ds.iloc[0:int(threshold * len(sorted_ds))]
@@ -21,7 +21,7 @@ def getEnrichmentFactor(threshold, ds, sort_by="prob", truth="truth"):
     if expected > 0:
         ef = float(num_actives) / expected
     else:
-        ef = 0
+        ef = np.inf
     # ef = float(num_actives) / len(top_thresh) / (float(sum(sorted_ds[truth])) / len(sorted_ds))
 
     return ef
@@ -104,12 +104,12 @@ def plotRankROC(truth, results, title, fileName):
     return auc
 
 
-def getMeanEFs(truth, results, thresholds=[0.01, 0.05]):
+def getMeanEFs(truth, results, thresholds=[0.01, 0.05], eval_method="sim"):
     mean_efs={}
     for threshold in thresholds:
         ef = [getEnrichmentFactor(threshold, pd.DataFrame(data=list(zip(r, truth)), columns=("sim", "truth")),
                                   sort_by="sim",
-                                  truth="truth") for r in results]
+                                  truth="truth", ascending=False if eval_method=="sim" else True) for r in results]
 
         #        print(ef)
         ef_mean = np.mean(ef)

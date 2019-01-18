@@ -11,7 +11,7 @@ def get_immediate_subdirectories(a_dir):
     return [name for name in os.listdir(a_dir)
             if os.path.isdir(os.path.join(a_dir, name))]
 
-homeDir = os.environ["DISSERTATION_HOME"]
+homeDir = os.environ["DISSERTATION_HOME"]+"/Conformers/"
 #homeDir = "/home/etienne/MScAI/dissertation/Conformers"
 #homeDir = "/home/ubuntu/data_vol/projects/dissertation"
 molfiles = [[homeDir+"/"+x+"/",x] for x in get_immediate_subdirectories(homeDir)]
@@ -130,7 +130,7 @@ for molNdx in range(0, len(molfiles)):
         print("AUC(Rank)="+str(auc_rank))
         print("EF: ", mean_ef)
 
-        portionResults.append((molName, auc, auc_rank, mean_ef))
+        portionResults.append((molName, portion, auc, auc_rank, mean_ef))
         t1 = time.time();
         print("Time taken = "+str(t1-t0))
 

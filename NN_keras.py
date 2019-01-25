@@ -19,28 +19,8 @@ def get_immediate_subdirectories(a_dir):
 
 
 homeDir = "F:\\Conformers"
-# homeDir = "/home/etienne/MScAI/dissertation/Conformers"
-# homeDir = "/home/ubuntu/data_vol/projects/dissertation"
+
 molfiles = [[homeDir + "\\" + x + "\\", x] for x in get_immediate_subdirectories(homeDir)]
-
-
-# homeDir = "/home/ubuntu/data_vol/projects/dissertation"
-# molfiles = [[homeDir + "/Conformers/Adenosine A2a receptor (GPCR)/", "actives_final.ism", "decoys_final.ism"],
-#             [homeDir + "/Conformers/Progesterone Receptor/", "actives_final.ism", "decoys_final.ism"],
-#             [homeDir + "/Conformers/Neuraminidase/", "actives_final.ism", "decoys_final.ism"],
-#             [homeDir + "/Conformers/Thymidine kinase/", "actives_final.ism", "decoys_final.ism"],
-#             [homeDir + "/Conformers/Leukotriene A4 hydrolase (Protease)/", "actives_final.ism", "decoys_final.ism"],
-#             [homeDir + "/Conformers/HIVPR/", "actives_final.ism", "decoys_final.ism"]]
-
-
-# from sklearn.ensemble import VotingClassifier
-
-# (test_ds, test_paths) = cu.loadDescriptors(molfiles[2], 10, dtype="usr", active_decoy_ratio=0, selection_policy="RANDOM", return_type="SEPERATE")
-# ds1 = cu.split(test_ds, 2, policy="SEQUENTIAL")
-# ds2 = cu.lumpRecords(test_ds)
-#
-# (p1, p1_sel) = cu.takePortion(test_ds, 0.3, selection_policy="RANDOM", return_type="LUMPED")
-# (p2, p2_sel) = cu.takePortion(test_ds, 0.5, selection_policy="RANDOM", return_type="LUMPED", exclusion_list=p1_sel)
 
 def getKerasNNModel(descDim):
     INPUT_DIM = descDim
@@ -61,6 +41,7 @@ datasetPortion = [1, 0.8, 0.6, 0.5, 0.3, 0.1, 0.05, 10]
 portionResults = []
 
 for molNdx in range(0, len(molfiles)):
+    molName = molfiles[molNdx][1]  # [molfiles[molNdx].rfind("/", 0, -1)+1:-1]
     for portion in datasetPortion:
         t0 = time.time()
         molNdx = 0
@@ -108,57 +89,78 @@ for molNdx in range(0, len(molfiles)):
             ann = getKerasNNModel(numcols)
             ann.fit(train_ds.iloc[:, 0:numcols], ((train_ds["active"])).astype(int) * 100,
                     batch_size=200,
-                    epochs=10)
-            # ann.fit(train_ds.iloc[:, 0:numcols], ((train_ds["active"])).astype(int)*100)
+                    epochs=1000)
 
             results = pd.DataFrame()
 
             results["score"] = [max(ann.predict(x[0].iloc[:, 0:numcols]).ravel()) for x in val_ds]
             results["truth"] = [x[2] for x in val_ds]
             auc = eval.plotSimROC(np.array(results["truth"]), np.array([results["score"]]), "", None)
-            auc_rank = eval.plotRankROC(np.array(results["truth"]), np.array([results["score"]]), "", None)
             mean_ef = eval.getMeanEFs(np.array(results["truth"]), np.array([results["score"]]))
-            foldResults.append(auc)
+            foldResults.append(auc, mean_ef)
 
         print("X-Validation results: ")
         print(foldResults)
 
         if len(foldResults) > 0:
-            print("mean AUC=" + str(np.mean(foldResults)) + ", std=" + str(np.std(foldResults)))
+            mean_auc_sim = np.mean([x[0] for x in foldResults])
+            std_auc_sim = np.std(np.mean([x[0] for x in foldResults]))
+            mean_mean_ef_1pc = np.mean([x[1][0.01] for x in foldResults])
+            std_mean_ef_1pc = np.std([x[1][0.01] for x in foldResults])
+            mean_mean_ef_5pc = np.mean([x[1][0.05] for x in foldResults])
+            std_mean_ef_5pc = np.std([x[1][0.05] for x in foldResults])
 
-            componentResults.append((auc, mean_ef))
+            print("mean AUC=" + str(mean_auc_sim) +
+                  ", std=" + str(std_auc_sim) +
+                  ", mean EF(1%)=" + str(mean_mean_ef_1pc) +
+                  ", std=" + str(std_mean_ef_1pc) +
+                  ", mean EF(5%)=" + str(mean_mean_ef_5pc) +
+                  ", std=" + str(std_mean_ef_5pc))
+
+            componentResults.append((molName, portion, auc, mean_ef))
         else:
             print("X-Validation returned no results. Skipping training...")
-            componentResults.append((0, 0))
+            componentResults.append((molName, portion, 0, 0))
 
         train_ds = cu.lumpRecords(n_fold_ds)
         ann = getKerasNNModel(numcols)
         ann.fit(train_ds.iloc[:, 0:numcols], ((train_ds["active"])).astype(int) * 100,
                 batch_size=200,
-                epochs=500)
+                epochs=1000)
 
         results = pd.DataFrame()
 
         results["score"] = [max(ann.predict(x[0].iloc[:, 0:numcols]).ravel()) for x in test_ds]
         # results["a_score"] = [G_a.score(x[0].iloc[:, 0:numcols]) for x in test_ds]
         results["truth"] = [x[2] for x in test_ds]  # np.array(test_ds)[:, 2]
-        molName = molfiles[molNdx][1]  # [molfiles[molNdx].rfind("/", 0, -1)+1:-1]
+
         auc = eval.plotSimROC(results["truth"], [results["score"]], molName + "[ANN, " + str(portion * 100) + "%]",
                               molName + "_AMM_" + str(portion * 100) + ".pdf")
-        auc_rank = eval.plotRankROC(results["truth"], [results["score"]],
-                                    molName + "[ANN, " + str(portion * 100) + "%]",
-                                    molName + "_AMM_" + str(portion * 100) + ".pdf")
         mean_ef = eval.getMeanEFs(np.array(results["truth"]), np.array([results["score"]]))
 
         # print("Final results, num components = ", str(components)+": ")
         print("AUC(Sim)=" + str(auc))
-        print("AUC(Rank)=" + str(auc_rank))
         print("EF: ", mean_ef)
 
-        portionResults.append((molName, portion, auc, auc_rank, mean_ef))
+        portionResults.append((molName, portion, auc, mean_ef))
         t1 = time.time();
         print("Time taken = " + str(t1 - t0))
+
+        print(componentResults)
         print(portionResults)
 
+        full_train_ds = test_ds
+        full_train_ds.extend(n_fold_ds)
+
+        ann = getKerasNNModel(numcols)
+        ann.fit(full_train_ds.iloc[:, 0:numcols], ((train_ds["active"])).astype(int) * 100, batch_size=200, epochs=1000)
+
+        # serialize model to JSON
+        model_json = ann.to_json()
+        with open(molName + "_AMM.json", "w") as json_file:
+            json_file.write(model_json)
+        # serialize weights to HDF5
+        ann.save_weights(molName + "_AMM.h5")
+        print("Saved model for "+molName+" to disk")
 
 

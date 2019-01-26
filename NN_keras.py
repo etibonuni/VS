@@ -18,7 +18,7 @@ def get_immediate_subdirectories(a_dir):
             if os.path.isdir(os.path.join(a_dir, name))]
 
 
-homeDir = "F:\\Conformers"
+homeDir = "C:\\Users\\Etienne Bonanno\\Documents\\Conformers"
 
 molfiles = [[homeDir + "\\" + x + "\\", x] for x in get_immediate_subdirectories(homeDir)]
 
@@ -57,7 +57,7 @@ for molNdx in range(0, len(molfiles)):
                                                    return_type="SEPERATE")
         numcols = test_ds[0][0].shape[1] - 2
 
-        folds = 10
+        folds = 2
         componentResults = []
 
         (n_fold_ds, n_fold_paths) = cu.loadDescriptors(molfiles[molNdx][0], portion * 0.8, dtype=descType,
@@ -88,7 +88,7 @@ for molNdx in range(0, len(molfiles)):
 
             ann = getKerasNNModel(numcols)
             ann.fit(train_ds.iloc[:, 0:numcols], ((train_ds["active"])).astype(int) * 100,
-                    batch_size=200,
+                    batch_size=500000,
                     epochs=1000)
 
             results = pd.DataFrame()
@@ -97,7 +97,7 @@ for molNdx in range(0, len(molfiles)):
             results["truth"] = [x[2] for x in val_ds]
             auc = eval.plotSimROC(np.array(results["truth"]), np.array([results["score"]]), "", None)
             mean_ef = eval.getMeanEFs(np.array(results["truth"]), np.array([results["score"]]))
-            foldResults.append(auc, mean_ef)
+            foldResults.append((auc, mean_ef))
 
         print("X-Validation results: ")
         print(foldResults)
@@ -125,7 +125,7 @@ for molNdx in range(0, len(molfiles)):
         train_ds = cu.lumpRecords(n_fold_ds)
         ann = getKerasNNModel(numcols)
         ann.fit(train_ds.iloc[:, 0:numcols], ((train_ds["active"])).astype(int) * 100,
-                batch_size=200,
+                batch_size=500000,
                 epochs=1000)
 
         results = pd.DataFrame()
@@ -149,11 +149,14 @@ for molNdx in range(0, len(molfiles)):
         print(componentResults)
         print(portionResults)
 
-        full_train_ds = test_ds
-        full_train_ds.extend(n_fold_ds)
+        # full_train_ds = test_ds
+        # full_train_ds.extend(n_fold_ds)
 
+        full_train_dss = [x[0] for x in test_ds]
+        full_train_dss.append([x[0] for x in n_fold_ds])
+        full_train_ds = cu.joinDataframes(full_train_dss)
         ann = getKerasNNModel(numcols)
-        ann.fit(full_train_ds.iloc[:, 0:numcols], ((train_ds["active"])).astype(int) * 100, batch_size=200, epochs=1000)
+        ann.fit(full_train_ds.iloc[:, 0:numcols], ((full_train_ds["active"])).astype(int) * 100, batch_size=200, epochs=1000)
 
         # serialize model to JSON
         model_json = ann.to_json()

@@ -3,10 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="de6588df-a1d3-4c63-81e3-ee5d4e68217b" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/GMM_sklearn_actives.py" afterPath="$PROJECT_DIR$/GMM_sklearn_actives.py" />
       <change beforePath="$PROJECT_DIR$/IsoForest_sklearn_actives.py" afterPath="$PROJECT_DIR$/IsoForest_sklearn_actives.py" />
       <change beforePath="$PROJECT_DIR$/NN_keras.py" afterPath="$PROJECT_DIR$/NN_keras.py" />
-      <change beforePath="$PROJECT_DIR$/NN_sklearn_actives.py" afterPath="$PROJECT_DIR$/NN_sklearn_actives.py" />
       <change beforePath="$PROJECT_DIR$/es5_plot.pdf" afterPath="" />
       <change beforePath="$PROJECT_DIR$/esh_plot.pdf" afterPath="" />
       <change beforePath="$PROJECT_DIR$/usr_plot.pdf" afterPath="" />
@@ -80,8 +78,8 @@
       <file leaf-file-name="IsoForest_sklearn_actives.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/IsoForest_sklearn_actives.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="829">
-              <caret line="109" column="45" lean-forward="false" selection-start-line="109" selection-start-column="45" selection-end-line="109" selection-end-column="45" />
+            <state relative-caret-position="-510">
+              <caret line="80" column="69" lean-forward="false" selection-start-line="80" selection-start-column="52" selection-end-line="80" selection-end-column="69" />
               <folding>
                 <element signature="e#70#114#0" expanded="true" />
               </folding>
@@ -124,8 +122,8 @@
       <file leaf-file-name="NN_keras.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/NN_keras.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1227">
-              <caret line="84" column="32" lean-forward="false" selection-start-line="84" selection-start-column="32" selection-end-line="84" selection-end-column="32" />
+            <state relative-caret-position="345">
+              <caret line="23" column="0" lean-forward="true" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
               <folding>
                 <element signature="e#71#89#0" expanded="true" />
               </folding>
@@ -507,7 +505,28 @@
       <option name="project" value="LOCAL" />
       <updated>1547841184086</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Tweaks">
+      <created>1548403391536</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1548403391537</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Fixes">
+      <created>1548538939672</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1548538939672</updated>
+    </task>
+    <task id="LOCAL-00019" summary="Fixes">
+      <created>1548539969215</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1548539969215</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -552,7 +571,9 @@
     <MESSAGE value="Compute Rank ROC" />
     <MESSAGE value="Cleanup" />
     <MESSAGE value="Add KerasNN, IsoForest, 1-class SVM" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add KerasNN, IsoForest, 1-class SVM" />
+    <MESSAGE value="Tweaks" />
+    <MESSAGE value="Fixes" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1008,16 +1029,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/IsoForest_sklearn_actives.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="829">
-          <caret line="109" column="45" lean-forward="false" selection-start-line="109" selection-start-column="45" selection-end-line="109" selection-end-column="45" />
-          <folding>
-            <element signature="e#70#114#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/conformer_utils.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="298">
@@ -1028,10 +1039,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/IsoForest_sklearn_actives.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-510">
+          <caret line="80" column="69" lean-forward="false" selection-start-line="80" selection-start-column="52" selection-end-line="80" selection-end-column="69" />
+          <folding>
+            <element signature="e#70#114#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/NN_keras.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1227">
-          <caret line="84" column="32" lean-forward="false" selection-start-line="84" selection-start-column="32" selection-end-line="84" selection-end-column="32" />
+        <state relative-caret-position="345">
+          <caret line="23" column="0" lean-forward="true" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
           <folding>
             <element signature="e#71#89#0" expanded="true" />
           </folding>

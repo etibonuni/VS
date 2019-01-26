@@ -19,7 +19,7 @@ molfiles = [[homeDir+"/"+x+"/",x] for x in get_immediate_subdirectories(homeDir)
 print(molfiles)
 
 datasetPortion=[1, 0.8, 0.6, 0.5, 0.3, 0.1, 0.05, 10]
-params=[100, 10]
+params=[500, 100, 10]
 
 componentResults = []
 xvalResults=[]
@@ -86,7 +86,7 @@ for molNdx in range(6, len(molfiles)):
                         mean_ef = eval.getMeanEFs(np.array(results["truth"]), np.array([results["score"]]), eval_method="sim")
                         foldResults.append((auc, mean_ef))
                     except:
-                        foldResults.append((0,0))
+                        foldResults.append((0,{0.01:0, 0.05:0}))
 
                 print("X-Validation results: ")
                 print(foldResults)
@@ -136,7 +136,7 @@ for molNdx in range(6, len(molfiles)):
             results["truth"] = [x[2] for x in test_ds]#np.array(test_ds)[:, 2]
 
             auc = eval.plotSimROC(results["truth"], [results["score"]], molName+"[1C-SVM, "+str(portion*100)+"%]", molName+"_1CSVM_sim_"+str(portion*100)+".pdf")
-            mean_ef = eval.getMeanEFs(np.array(results["truth"]), np.array([results["score"]]), eval_method="dist")
+            mean_ef = eval.getMeanEFs(np.array(results["truth"]), np.array([results["score"]]), eval_method="sim")
 
             print("AUC(Sim)="+str(auc))
             print("EF: ", mean_ef)

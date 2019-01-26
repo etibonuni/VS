@@ -18,9 +18,10 @@ def get_immediate_subdirectories(a_dir):
             if os.path.isdir(os.path.join(a_dir, name))]
 
 
-homeDir = "C:\\Users\\Etienne Bonanno\\Documents\\Conformers"
+homeDir = os.environ["DISSERTATION_HOME"]+"/Conformers/"
+print(homeDir)
+molfiles = [[homeDir + "/" + x + "/", x] for x in get_immediate_subdirectories(homeDir)]
 
-molfiles = [[homeDir + "\\" + x + "\\", x] for x in get_immediate_subdirectories(homeDir)]
 
 def getKerasNNModel(descDim):
     INPUT_DIM = descDim

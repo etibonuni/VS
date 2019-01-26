@@ -40,6 +40,9 @@ datasetPortion = [1, 0.8, 0.6, 0.5, 0.3, 0.1, 0.05, 10]
 
 portionResults = []
 
+from keras.callbacks import EarlyStopping
+early_stopping = EarlyStopping(monitor='loss', patience=25, verbose=1)
+
 for molNdx in range(0, len(molfiles)):
     molName = molfiles[molNdx][1]  # [molfiles[molNdx].rfind("/", 0, -1)+1:-1]
     for portion in datasetPortion:
@@ -57,7 +60,7 @@ for molNdx in range(0, len(molfiles)):
                                                    return_type="SEPERATE")
         numcols = test_ds[0][0].shape[1] - 2
 
-        folds = 2
+        folds = 5
         componentResults = []
 
         (n_fold_ds, n_fold_paths) = cu.loadDescriptors(molfiles[molNdx][0], portion * 0.8, dtype=descType,
@@ -89,7 +92,7 @@ for molNdx in range(0, len(molfiles)):
             ann = getKerasNNModel(numcols)
             ann.fit(train_ds.iloc[:, 0:numcols], ((train_ds["active"])).astype(int) * 100,
                     batch_size=500000,
-                    epochs=1000)
+                    epochs=1000, callbacks=[early_stopping])
 
             results = pd.DataFrame()
 
@@ -126,7 +129,7 @@ for molNdx in range(0, len(molfiles)):
         ann = getKerasNNModel(numcols)
         ann.fit(train_ds.iloc[:, 0:numcols], ((train_ds["active"])).astype(int) * 100,
                 batch_size=500000,
-                epochs=1000)
+                epochs=1000, callbacks=[early_stopping])
 
         results = pd.DataFrame()
 
@@ -135,7 +138,7 @@ for molNdx in range(0, len(molfiles)):
         results["truth"] = [x[2] for x in test_ds]  # np.array(test_ds)[:, 2]
 
         auc = eval.plotSimROC(results["truth"], [results["score"]], molName + "[ANN, " + str(portion * 100) + "%]",
-                              molName + "_AMM_" + str(portion * 100) + ".pdf")
+                              molName + "_ANN_k_" + str(portion * 100) + ".pdf")
         mean_ef = eval.getMeanEFs(np.array(results["truth"]), np.array([results["score"]]))
 
         # print("Final results, num components = ", str(components)+": ")
@@ -156,7 +159,7 @@ for molNdx in range(0, len(molfiles)):
         full_train_dss.append([x[0] for x in n_fold_ds])
         full_train_ds = cu.joinDataframes(full_train_dss)
         ann = getKerasNNModel(numcols)
-        ann.fit(full_train_ds.iloc[:, 0:numcols], ((full_train_ds["active"])).astype(int) * 100, batch_size=200, epochs=1000)
+        ann.fit(full_train_ds.iloc[:, 0:numcols], ((full_train_ds["active"])).astype(int) * 100, batch_size=200, epochs=1000, callbacks=[early_stopping])
 
         # serialize model to JSON
         model_json = ann.to_json()

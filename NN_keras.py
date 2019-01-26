@@ -160,7 +160,7 @@ for molNdx in range(0, len(molfiles)):
         full_train_dss.append([x[0] for x in n_fold_ds])
         full_train_ds = cu.joinDataframes(full_train_dss)
         ann = getKerasNNModel(numcols)
-        ann.fit(full_train_ds.iloc[:, 0:numcols], ((full_train_ds["active"])).astype(int) * 100, batch_size=200, epochs=1000, callbacks=[early_stopping])
+        ann.fit(full_train_ds.iloc[:, 0:numcols], ((full_train_ds["active"])).astype(int) * 100, batch_size=500000, epochs=1000, callbacks=[early_stopping])
 
         # serialize model to JSON
         model_json = ann.to_json()

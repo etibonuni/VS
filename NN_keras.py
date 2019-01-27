@@ -36,9 +36,11 @@ def getKerasNNModel(descDim):
 
     return model
 
-
+params = [10, 50, 100]
 datasetPortion = [1, 0.8, 0.6, 0.5, 0.3, 0.1, 0.05, 10]
 
+componentResults = []
+xvalResults=[]
 portionResults = []
 
 from keras.callbacks import EarlyStopping
@@ -70,61 +72,65 @@ for molNdx in range(0, len(molfiles)):
                                                        exclusion_list=test_paths)
 
         (folds_list, excl_list) = cu.split(n_fold_ds, folds, policy="RANDOM")
+        componentResults = []
 
-        foldResults = []
+        for param in params:
+            foldResults = []
 
-        for fold in range(0, folds):
+            for fold in range(0, folds):
 
-            val_ds = folds_list[fold]
+                val_ds = folds_list[fold]
 
-            train_ds = None;
+                train_ds = None;
 
-            for i in range(0, folds):
-                if i != fold:
-                    if train_ds is None:
-                        train_ds = [r[0] for r in folds_list[i]]
-                    else:
-                        train_ds.append([r[0] for r in folds_list[i]])
+                for i in range(0, folds):
+                    if i != fold:
+                        if train_ds is None:
+                            train_ds = [r[0] for r in folds_list[i]]
+                        else:
+                            train_ds.append([r[0] for r in folds_list[i]])
 
-            train_ds = cu.joinDataframes(train_ds)
+                train_ds = cu.joinDataframes(train_ds)
 
-            numcols = train_ds.shape[1] - 2
+                numcols = train_ds.shape[1] - 2
 
-            ann = getKerasNNModel(numcols)
-            ann.fit(train_ds.iloc[:, 0:numcols], ((train_ds["active"])).astype(int) * 100,
-                    batch_size=500000,
-                    epochs=1000, callbacks=[early_stopping])
+                ann = getKerasNNModel(numcols)
+                ann.fit(train_ds.iloc[:, 0:numcols], ((train_ds["active"])).astype(int) * 100,
+                        batch_size=500000,
+                        epochs=1000, callbacks=[early_stopping])
 
-            results = pd.DataFrame()
+                results = pd.DataFrame()
 
-            results["score"] = [max(ann.predict(x[0].iloc[:, 0:numcols]).ravel()) for x in val_ds]
-            results["truth"] = [x[2] for x in val_ds]
-            auc = eval.plotSimROC(np.array(results["truth"]), np.array([results["score"]]), "", None)
-            mean_ef = eval.getMeanEFs(np.array(results["truth"]), np.array([results["score"]]))
-            foldResults.append((auc, mean_ef))
+                results["score"] = [max(ann.predict(x[0].iloc[:, 0:numcols]).ravel()) for x in val_ds]
+                results["truth"] = [x[2] for x in val_ds]
+                auc = eval.plotSimROC(np.array(results["truth"]), np.array([results["score"]]), "", None)
+                mean_ef = eval.getMeanEFs(np.array(results["truth"]), np.array([results["score"]]))
+                foldResults.append((auc, mean_ef))
 
-        print("X-Validation results: ")
-        print(foldResults)
+            print("X-Validation results: ")
+            print(foldResults)
 
-        if len(foldResults) > 0:
-            mean_auc_sim = np.mean([x[0] for x in foldResults])
-            std_auc_sim = np.std(np.mean([x[0] for x in foldResults]))
-            mean_mean_ef_1pc = np.mean([x[1][0.01] for x in foldResults])
-            std_mean_ef_1pc = np.std([x[1][0.01] for x in foldResults])
-            mean_mean_ef_5pc = np.mean([x[1][0.05] for x in foldResults])
-            std_mean_ef_5pc = np.std([x[1][0.05] for x in foldResults])
+            if len(foldResults) > 0:
+                mean_auc_sim = np.mean([x[0] for x in foldResults])
+                std_auc_sim = np.std(np.mean([x[0] for x in foldResults]))
+                mean_mean_ef_1pc = np.mean([x[1][0.01] for x in foldResults])
+                std_mean_ef_1pc = np.std([x[1][0.01] for x in foldResults])
+                mean_mean_ef_5pc = np.mean([x[1][0.05] for x in foldResults])
+                std_mean_ef_5pc = np.std([x[1][0.05] for x in foldResults])
 
-            print("mean AUC=" + str(mean_auc_sim) +
-                  ", std=" + str(std_auc_sim) +
-                  ", mean EF(1%)=" + str(mean_mean_ef_1pc) +
-                  ", std=" + str(std_mean_ef_1pc) +
-                  ", mean EF(5%)=" + str(mean_mean_ef_5pc) +
-                  ", std=" + str(std_mean_ef_5pc))
+                print("mean AUC=" + str(mean_auc_sim) +
+                      ", std=" + str(std_auc_sim) +
+                      ", mean EF(1%)=" + str(mean_mean_ef_1pc) +
+                      ", std=" + str(std_mean_ef_1pc) +
+                      ", mean EF(5%)=" + str(mean_mean_ef_5pc) +
+                      ", std=" + str(std_mean_ef_5pc))
 
-            componentResults.append((molName, portion, auc, mean_ef))
-        else:
-            print("X-Validation returned no results. Skipping training...")
-            componentResults.append((molName, portion, 0, 0))
+                componentResults.append((molName, portion, auc, mean_ef))
+            else:
+                print("X-Validation returned no results. Skipping training...")
+                componentResults.append((molName, portion, 0, 0))
+
+        xvalResults.extend(componentResults)
 
         train_ds = cu.lumpRecords(n_fold_ds)
         ann = getKerasNNModel(numcols)
@@ -150,7 +156,7 @@ for molNdx in range(0, len(molfiles)):
         t1 = time.time();
         print("Time taken = " + str(t1 - t0))
 
-        print(componentResults)
+        print(xvalResults)
         print(portionResults)
 
         # full_train_ds = test_ds

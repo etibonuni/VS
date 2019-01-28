@@ -94,7 +94,7 @@ for molNdx in range(0, len(molfiles)):
                         else:
                             train_ds.append([r[0] for r in folds_list[i]])
 
-                train_ds = cu.joinDataframes(train_ds, hiddenSize)
+                train_ds = cu.joinDataframes(train_ds, param)
 
                 numcols = train_ds.shape[1] - 2
 

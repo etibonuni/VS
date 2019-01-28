@@ -23,11 +23,11 @@ print(homeDir)
 molfiles = [[homeDir + "/" + x + "/", x] for x in get_immediate_subdirectories(homeDir)]
 
 
-def getKerasNNModel(descDim):
+def getKerasNNModel(descDim, hiddenSize):
     INPUT_DIM = descDim
 
     model = models.Sequential()
-    model.add(layers.Dense(100, activation='relu', input_dim=INPUT_DIM))
+    model.add(layers.Dense(hiddenSize, activation='relu', input_dim=INPUT_DIM))
     model.add(layers.Dense(1, activation='linear', activity_regularizer=regularizers.l2(0.0001)))
 
     model.compile(optimizer='adam',
@@ -48,7 +48,11 @@ early_stopping = EarlyStopping(monitor='loss', patience=25, verbose=1)
 
 for molNdx in range(0, len(molfiles)):
     molName = molfiles[molNdx][1]  # [molfiles[molNdx].rfind("/", 0, -1)+1:-1]
+    print("Processing "+molName)
+
     for portion in datasetPortion:
+        print("Portion "+str(portion))
+
         t0 = time.time()
         molNdx = 0
         descTypes = ["usr", "esh", "es5"]
@@ -76,9 +80,9 @@ for molNdx in range(0, len(molfiles)):
 
         for param in params:
             foldResults = []
-
+            print("Param "+str(param))
             for fold in range(0, folds):
-
+                print("Fold "+str(fold))
                 val_ds = folds_list[fold]
 
                 train_ds = None;
@@ -90,7 +94,7 @@ for molNdx in range(0, len(molfiles)):
                         else:
                             train_ds.append([r[0] for r in folds_list[i]])
 
-                train_ds = cu.joinDataframes(train_ds)
+                train_ds = cu.joinDataframes(train_ds, hiddenSize)
 
                 numcols = train_ds.shape[1] - 2
 
@@ -125,15 +129,22 @@ for molNdx in range(0, len(molfiles)):
                       ", mean EF(5%)=" + str(mean_mean_ef_5pc) +
                       ", std=" + str(std_mean_ef_5pc))
 
-                componentResults.append((molName, portion, auc, mean_ef))
+                componentResults.append((molName, portion, param, mean_auc_sim, std_auc_sim, mean_mean_ef_1pc,
+                                         std_mean_ef_1pc, mean_mean_ef_5pc, std_mean_ef_5pc))
             else:
                 print("X-Validation returned no results. Skipping training...")
-                componentResults.append((molName, portion, 0, 0))
+                componentResults.append((molName, portion, param, 0, 0, 0, 0, 0, 0))
 
         xvalResults.extend(componentResults)
 
+        # Find best score
+        ef_rank = [x[5] for x in componentResults]
+
+        best_estimators = params[np.argmax(ef_rank)]
+        print("Best-score estimators no.: " + str(best_estimators))
+
         train_ds = cu.lumpRecords(n_fold_ds)
-        ann = getKerasNNModel(numcols)
+        ann = getKerasNNModel(numcols, best_estimators)
         ann.fit(train_ds.iloc[:, 0:numcols], ((train_ds["active"])).astype(int) * 100,
                 batch_size=500000,
                 epochs=1000, callbacks=[early_stopping])

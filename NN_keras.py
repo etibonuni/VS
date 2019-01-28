@@ -94,11 +94,11 @@ for molNdx in range(0, len(molfiles)):
                         else:
                             train_ds.append([r[0] for r in folds_list[i]])
 
-                train_ds = cu.joinDataframes(train_ds, param)
+                train_ds = cu.joinDataframes(train_ds)
 
                 numcols = train_ds.shape[1] - 2
 
-                ann = getKerasNNModel(numcols)
+                ann = getKerasNNModel(numcols, param)
                 ann.fit(train_ds.iloc[:, 0:numcols], ((train_ds["active"])).astype(int) * 100,
                         batch_size=500000,
                         epochs=1000, callbacks=[early_stopping])

@@ -54,7 +54,7 @@ for molNdx in range(0, len(molfiles)):
         print("Portion "+str(portion))
 
         t0 = time.time()
-        molNdx = 0
+
         descTypes = ["usr", "esh", "es5"]
         descType = descTypes[1]
         if portion <= 1:
@@ -167,8 +167,10 @@ for molNdx in range(0, len(molfiles)):
         t1 = time.time();
         print("Time taken = " + str(t1 - t0))
 
-        print(xvalResults)
-        print(portionResults)
+        f1 = open('results.txt', 'w')
+        print(xvalResults, file=f1)
+        print(portionResults, file=f1)
+        f1.close()
 
         # full_train_ds = test_ds
         # full_train_ds.extend(n_fold_ds)

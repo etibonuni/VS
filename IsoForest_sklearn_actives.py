@@ -25,8 +25,12 @@ componentResults = []
 xvalResults=[]
 portionResults = []
 
-for molNdx in range(6, len(molfiles)):
+done = []
+for molNdx in range(0, len(molfiles)):
     molName = molfiles[molNdx][1]  # [molfiles[molNdx].rfind("/", 0, -1)+1:-1]
+    if molName in done:
+        continue
+
     for portion in datasetPortion:
         #try:
             t0 = time.time()
@@ -135,7 +139,7 @@ for molNdx in range(6, len(molfiles)):
             results["score"] = [max(clf.decision_function((x[0].iloc[:, 0:numcols]))) for x in test_ds]
             results["truth"] = [x[2] for x in test_ds]#np.array(test_ds)[:, 2]
 
-            auc = eval.plotSimROC(results["truth"], [results["score"]], molName+"[1C-SVM, "+str(portion*100)+"%]", molName+"_1CSVM_sim_"+str(portion*100)+".pdf")
+            auc = eval.plotSimROC(results["truth"], [results["score"]], molName+"[IsoForest, "+str(portion*100)+"%]", molName+"_IsoForest_sim_"+str(portion*100)+".pdf")
             mean_ef = eval.getMeanEFs(np.array(results["truth"]), np.array([results["score"]]), eval_method="sim")
 
             print("AUC(Sim)="+str(auc))
@@ -147,6 +151,25 @@ for molNdx in range(6, len(molfiles)):
 
             print(xvalResults)
             print(portionResults)
+
+        f1 = open('results_isoForest.txt', 'w')
+        print(xvalResults, file=f1)
+        print(portionResults, file=f1)
+        f1.close()
+
+        full_train_dss = [x[0] for x in test_ds]
+        full_train_dss.append([x[0] for x in n_fold_ds])
+        full_train_ds = cu.joinDataframes(full_train_dss)
+        clf = IsolationForest(n_estimators=best_estimators, n_jobs=-1)
+
+        G_a = clf.fit(full_train_dss.iloc[:, 0:numcols], full_train_dss.iloc[:, numcols])
+
+        import pickle
+        mdlf = open(molName + "_IsoForest.pkl", "w")
+        pickle.dump(G_a, mdlf)
+        mdlf.close()
+
+        print("Saved model for "+molName+" to disk")
         #except:
         #    print("Eception occurred.")
         #    pass

@@ -32,91 +32,92 @@ for molNdx in range(0, len(molfiles)):
         continue
 
     for portion in datasetPortion:
-        #try:
-        t0 = time.time()
-        descTypes = ["usr", "esh", "es5"]
-        descType=descTypes[1]
-        if portion <= 1:
-            print("Loading " + str(portion*100) +"% of " + molfiles[molNdx][1])
-        else:
-            print("Loading " + str(portion) + " actives from " + molfiles[molNdx][1])
-
-        (test_ds, test_paths) = cu.loadDescriptors(molfiles[molNdx][0], portion*0.2, dtype=descType, active_decoy_ratio=-1, selection_policy="RANDOM", return_type="SEPERATE")
-        numcols = test_ds[0][0].shape[1]-2
-
-        folds = 5
-
-        (n_fold_ds, n_fold_paths) = cu.loadDescriptors(molfiles[molNdx][0], portion*0.8, dtype=descType, active_decoy_ratio=-1,
-                                                       selection_policy="RANDOM", return_type="SEPARATE", exclusion_list=test_paths)
-
-        (folds_list, excl_list) = cu.split(n_fold_ds, folds, policy="RANDOM")
-
-        componentResults = []
-        for param in params:
-            foldResults = []
-
-
-            for fold in range(0, folds):
-                try:
-                    val_ds = folds_list[fold]
-
-                    train_ds = None;
-
-                    for i in range(0, folds):
-                        if i != fold:
-                            if train_ds is None:
-                                train_ds = [r[0] for r in folds_list[i]]
-                            else:
-                                train_ds.append([r[0] for r in folds_list[i]])
-
-                    train_ds = cu.joinDataframes(train_ds)
-
-                    numcols = train_ds.shape[1]-2
-
-                    clf = IsolationForest(n_estimators=param, n_jobs=-1)
-
-                    train_a = train_ds[train_ds["active"] == True]
-
-                    clf.fit(train_a.iloc[:, 0:numcols], None)
-
-
-                    results = pd.DataFrame()
-
-                    results["score"] = [max(clf.decision_function(x[0].iloc[:, 0:numcols]).ravel()) for x in val_ds]
-
-                    results["truth"] = [x[2] for x in val_ds]
-
-                    auc = eval.plotSimROC(np.array(results["truth"]), np.array([results["score"]]), "", None)
-                    mean_ef = eval.getMeanEFs(np.array(results["truth"]), np.array([results["score"]]), eval_method="sim")
-                    foldResults.append((auc, mean_ef))
-                except:
-                    foldResults.append((0,{0.01:0, 0.05:0}))
-
-            print("X-Validation results: ")
-            print(foldResults)
-
-            if len(foldResults)>0:
-                mean_auc_sim = np.mean([x[0] for x in foldResults])
-                std_auc_sim = np.std(np.mean([x[0] for x in foldResults]))
-                mean_mean_ef_1pc = np.mean([x[1][0.01] for x in foldResults])
-                std_mean_ef_1pc = np.std([x[1][0.01] for x in foldResults])
-                mean_mean_ef_5pc = np.mean([x[1][0.05] for x in foldResults])
-                std_mean_ef_5pc = np.std([x[1][0.05] for x in foldResults])
-
-                print("mean AUC=" + str(mean_auc_sim) +
-                      ", std=" + str(std_auc_sim) +
-                      ", mean EF(1%)=" + str(mean_mean_ef_1pc) +
-                      ", std=" + str(std_mean_ef_1pc) +
-                      ", mean EF(5%)=" + str(mean_mean_ef_5pc) +
-                      ", std=" + str(std_mean_ef_5pc))
-
-                componentResults.append((molName, portion, param, mean_auc_sim, std_auc_sim, mean_mean_ef_1pc,
-                                         std_mean_ef_1pc, mean_mean_ef_5pc, std_mean_ef_5pc))
+        try:
+            t0 = time.time()
+            descTypes = ["usr", "esh", "es5"]
+            descType=descTypes[1]
+            if portion <= 1:
+                print("Loading " + str(portion*100) +"% of " + molfiles[molNdx][1])
             else:
-                print("X-Validation returned no results. Skipping training...")
-                componentResults.append((molName, portion, param, 0, 0, 0, 0, 0, 0))
+                print("Loading " + str(portion) + " actives from " + molfiles[molNdx][1])
+
+            (test_ds, test_paths) = cu.loadDescriptors(molfiles[molNdx][0], portion*0.2, dtype=descType, active_decoy_ratio=-1, selection_policy="RANDOM", return_type="SEPERATE")
+            numcols = test_ds[0][0].shape[1]-2
+
+            folds = 5
+
+            (n_fold_ds, n_fold_paths) = cu.loadDescriptors(molfiles[molNdx][0], portion*0.8, dtype=descType, active_decoy_ratio=-1,
+                                                           selection_policy="RANDOM", return_type="SEPARATE", exclusion_list=test_paths)
+
+            (folds_list, excl_list) = cu.split(n_fold_ds, folds, policy="RANDOM")
+
+            componentResults = []
+            for param in params:
+                foldResults = []
 
 
+                for fold in range(0, folds):
+                    try:
+                        val_ds = folds_list[fold]
+
+                        train_ds = None;
+
+                        for i in range(0, folds):
+                            if i != fold:
+                                if train_ds is None:
+                                    train_ds = [r[0] for r in folds_list[i]]
+                                else:
+                                    train_ds.append([r[0] for r in folds_list[i]])
+
+                        train_ds = cu.joinDataframes(train_ds)
+
+                        numcols = train_ds.shape[1]-2
+
+                        clf = IsolationForest(n_estimators=param, n_jobs=-1)
+
+                        train_a = train_ds[train_ds["active"] == True]
+
+                        clf.fit(train_a.iloc[:, 0:numcols], None)
+
+
+                        results = pd.DataFrame()
+
+                        results["score"] = [max(clf.decision_function(x[0].iloc[:, 0:numcols]).ravel()) for x in val_ds]
+
+                        results["truth"] = [x[2] for x in val_ds]
+
+                        auc = eval.plotSimROC(np.array(results["truth"]), np.array([results["score"]]), "", None)
+                        mean_ef = eval.getMeanEFs(np.array(results["truth"]), np.array([results["score"]]), eval_method="sim")
+                        foldResults.append((auc, mean_ef))
+                    except:
+                        foldResults.append((0,{0.01:0, 0.05:0}))
+
+                print("X-Validation results: ")
+                print(foldResults)
+
+                if len(foldResults)>0:
+                    mean_auc_sim = np.mean([x[0] for x in foldResults])
+                    std_auc_sim = np.std(np.mean([x[0] for x in foldResults]))
+                    mean_mean_ef_1pc = np.mean([x[1][0.01] for x in foldResults])
+                    std_mean_ef_1pc = np.std([x[1][0.01] for x in foldResults])
+                    mean_mean_ef_5pc = np.mean([x[1][0.05] for x in foldResults])
+                    std_mean_ef_5pc = np.std([x[1][0.05] for x in foldResults])
+
+                    print("mean AUC=" + str(mean_auc_sim) +
+                          ", std=" + str(std_auc_sim) +
+                          ", mean EF(1%)=" + str(mean_mean_ef_1pc) +
+                          ", std=" + str(std_mean_ef_1pc) +
+                          ", mean EF(5%)=" + str(mean_mean_ef_5pc) +
+                          ", std=" + str(std_mean_ef_5pc))
+
+                    componentResults.append((molName, portion, param, mean_auc_sim, std_auc_sim, mean_mean_ef_1pc,
+                                             std_mean_ef_1pc, mean_mean_ef_5pc, std_mean_ef_5pc))
+                else:
+                    print("X-Validation returned no results. Skipping training...")
+                    componentResults.append((molName, portion, param, 0, 0, 0, 0, 0, 0))
+
+        except:
+            componentResults.append((molName, portion, param, 0, 0, 0, 0, 0, 0))
 
 
         xvalResults.extend(componentResults)

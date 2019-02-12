@@ -25,7 +25,7 @@ componentResults = []
 xvalResults=[]
 portionResults = []
 
-done = []
+done = ["aa2ar", "aldr", "comt", "fa10", "hivrt", "kith", "parp1", "pnph", "pygm", "thrb", "ace", "ampc", "dyr", "fgfr1", "hmdh", "lkha4", "pde5a", "pparg", "rxra", "try1", "aces", "andr", "egfr", "gcr", "hs90a", "mcr", "pgh1", "prgr", "sahh", "try1", "ada", "cdk2", "esr1", "hivpr", "inha", "mk14", "pgh2", "pur2", "src", "vgfr2"]
 for molNdx in range(0, len(molfiles)):
     molName = molfiles[molNdx][1]  # [molfiles[molNdx].rfind("/", 0, -1)+1:-1]
     if molName in done:
@@ -163,10 +163,10 @@ for molNdx in range(0, len(molfiles)):
     full_train_ds = cu.joinDataframes(full_train_dss)
     clf = IsolationForest(n_estimators=best_estimators, n_jobs=-1)
 
-    G_a = clf.fit(full_train_dss.iloc[:, 0:numcols], full_train_dss.iloc[:, numcols])
+    G_a = clf.fit(full_train_ds.iloc[:, 0:numcols], full_train_ds.iloc[:, numcols])
 
     import pickle
-    mdlf = open(molName + "_IsoForest.pkl", "w")
+    mdlf = open(molName + "_IsoForest.pkl", "wb")
     pickle.dump(G_a, mdlf)
     mdlf.close()
 

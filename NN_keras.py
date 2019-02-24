@@ -36,7 +36,7 @@ def getKerasNNModel(descDim, hiddenSize):
 
     return model
 
-params = [10, 50, 100]
+params = [100]
 datasetPortion = [1, 0.8, 0.6, 0.5, 0.3, 0.1, 0.05, 10]
 
 componentResults = []
@@ -53,7 +53,6 @@ for molNdx in range(0, len(molfiles)):
     for portion in datasetPortion:
         print("Portion "+str(portion))
 
-        t0 = time.time()
 
         descTypes = ["usr", "esh", "es5"]
         descType = descTypes[1]
@@ -145,6 +144,9 @@ for molNdx in range(0, len(molfiles)):
 
         train_ds = cu.lumpRecords(n_fold_ds)
         ann = getKerasNNModel(numcols, best_estimators)
+
+        t0 = time.time()
+
         ann.fit(train_ds.iloc[:, 0:numcols], ((train_ds["active"])).astype(int) * 100,
                 batch_size=500000,
                 epochs=1000, callbacks=[early_stopping])
@@ -159,12 +161,13 @@ for molNdx in range(0, len(molfiles)):
                               molName + "_ANN_k_" + str(portion * 100) + ".pdf")
         mean_ef = eval.getMeanEFs(np.array(results["truth"]), np.array([results["score"]]))
 
+        t1 = time.time();
+
         # print("Final results, num components = ", str(components)+": ")
         print("AUC(Sim)=" + str(auc))
         print("EF: ", mean_ef)
 
-        portionResults.append((molName, portion, auc, mean_ef))
-        t1 = time.time();
+        portionResults.append((molName, portion, auc, mean_ef, t1-t0))
         print("Time taken = " + str(t1 - t0))
 
         f1 = open('results.txt', 'w')

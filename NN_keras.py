@@ -46,7 +46,7 @@ portionResults = []
 from keras.callbacks import EarlyStopping
 early_stopping = EarlyStopping(monitor='accuracy', min_delta=0.001, patience=10, verbose=1)
 
-done = ['fa10', 'rxra', 'mk14', 'hmdh', 'gcr']
+done = []
 
 for molNdx in range(0, len(molfiles)):
     molName = molfiles[molNdx][1]  # [molfiles[molNdx].rfind("/", 0, -1)+1:-1]

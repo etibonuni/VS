@@ -52,7 +52,6 @@ for molNdx in range(0, len(molfiles)):
     molName = molfiles[molNdx][1]  # [molfiles[molNdx].rfind("/", 0, -1)+1:-1]
     if molName in done:
         continue
-<<<<<<< HEAD
             
     print("Processing "+molName)
 

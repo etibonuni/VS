@@ -44,10 +44,15 @@ xvalResults=[]
 portionResults = []
 
 from keras.callbacks import EarlyStopping
-early_stopping = EarlyStopping(monitor='loss', patience=25, verbose=1)
+early_stopping = EarlyStopping(monitor='accuracy', min_delta=0.001, patience=10, verbose=1)
+
+done = []
 
 for molNdx in range(0, len(molfiles)):
     molName = molfiles[molNdx][1]  # [molfiles[molNdx].rfind("/", 0, -1)+1:-1]
+    if molName in done:
+        continue
+
     print("Processing "+molName)
 
     for portion in datasetPortion:
@@ -55,7 +60,7 @@ for molNdx in range(0, len(molfiles)):
 
 
         descTypes = ["usr", "esh", "es5"]
-        descType = descTypes[1]
+        descType = descTypes[2]
         if portion <= 1:
             print("Loading " + str(portion * 100) + "% of " + molfiles[molNdx][1])
         else:
@@ -107,8 +112,9 @@ for molNdx in range(0, len(molfiles)):
                 results["score"] = [max(ann.predict(x[0].iloc[:, 0:numcols]).ravel()) for x in val_ds]
                 results["truth"] = [x[2] for x in val_ds]
                 auc = eval.plotSimROC(np.array(results["truth"]), np.array([results["score"]]), "", None)
+                auc_rank = eval.plotRankROC(np.array(results["truth"]), np.array([results["score"]]), "", None)
                 mean_ef = eval.getMeanEFs(np.array(results["truth"]), np.array([results["score"]]))
-                foldResults.append((auc, mean_ef))
+                foldResults.append((auc, auc_rank, mean_ef))
 
             print("X-Validation results: ")
             print(foldResults)
@@ -116,23 +122,27 @@ for molNdx in range(0, len(molfiles)):
             if len(foldResults) > 0:
                 mean_auc_sim = np.mean([x[0] for x in foldResults])
                 std_auc_sim = np.std(np.mean([x[0] for x in foldResults]))
-                mean_mean_ef_1pc = np.mean([x[1][0.01] for x in foldResults])
-                std_mean_ef_1pc = np.std([x[1][0.01] for x in foldResults])
-                mean_mean_ef_5pc = np.mean([x[1][0.05] for x in foldResults])
-                std_mean_ef_5pc = np.std([x[1][0.05] for x in foldResults])
+                mean_auc_rank = np.mean([x[1] for x in foldResults])
+                std_auc_rank = np.std(np.mean([x[1] for x in foldResults]))
+                mean_mean_ef_1pc = np.mean([x[2][0.01] for x in foldResults])
+                std_mean_ef_1pc = np.std([x[2][0.01] for x in foldResults])
+                mean_mean_ef_5pc = np.mean([x[2][0.05] for x in foldResults])
+                std_mean_ef_5pc = np.std([x[2][0.05] for x in foldResults])
 
-                print("mean AUC=" + str(mean_auc_sim) +
+                print("mean AUC(Sim)=" + str(mean_auc_sim) +
                       ", std=" + str(std_auc_sim) +
+                      ", mean AUC(Rank)=" + str(mean_auc_rank) +
+                      ", std=" + str(std_auc_rank) +
                       ", mean EF(1%)=" + str(mean_mean_ef_1pc) +
                       ", std=" + str(std_mean_ef_1pc) +
                       ", mean EF(5%)=" + str(mean_mean_ef_5pc) +
                       ", std=" + str(std_mean_ef_5pc))
 
-                componentResults.append((molName, portion, param, mean_auc_sim, std_auc_sim, mean_mean_ef_1pc,
+                componentResults.append((molName, portion, param, mean_auc_sim, std_auc_sim, mean_auc_rank, std_auc_rank, mean_mean_ef_1pc,
                                          std_mean_ef_1pc, mean_mean_ef_5pc, std_mean_ef_5pc))
             else:
                 print("X-Validation returned no results. Skipping training...")
-                componentResults.append((molName, portion, param, 0, 0, 0, 0, 0, 0))
+                componentResults.append((molName, portion, param, 0, 0, 0, 0, 0, 0, 0, 0))
 
         xvalResults.extend(componentResults)
 
@@ -158,7 +168,9 @@ for molNdx in range(0, len(molfiles)):
         results["truth"] = [x[2] for x in test_ds]  # np.array(test_ds)[:, 2]
 
         auc = eval.plotSimROC(results["truth"], [results["score"]], molName + "[ANN, " + str(portion * 100) + "%]",
-                              molName + "_ANN_k_" + str(portion * 100) + ".pdf")
+                              molName + "_ANN_k_" + str(portion * 100) + "_sim.pdf")
+        auc_rank = eval.plotRankROC(results["truth"], [results["score"]], molName + "[ANN, " + str(portion * 100) + "%]",
+                              molName + "_ANN_k_" + str(portion * 100) + "_rank.pdf")
         mean_ef = eval.getMeanEFs(np.array(results["truth"]), np.array([results["score"]]))
 
         t1 = time.time();
@@ -178,18 +190,18 @@ for molNdx in range(0, len(molfiles)):
         # full_train_ds = test_ds
         # full_train_ds.extend(n_fold_ds)
 
-        full_train_dss = [x[0] for x in test_ds]
-        full_train_dss.append([x[0] for x in n_fold_ds])
-        full_train_ds = cu.joinDataframes(full_train_dss)
-        ann = getKerasNNModel(numcols)
-        ann.fit(full_train_ds.iloc[:, 0:numcols], ((full_train_ds["active"])).astype(int) * 100, batch_size=500000, epochs=1000, callbacks=[early_stopping])
-
-        # serialize model to JSON
-        model_json = ann.to_json()
-        with open(molName + "_AMM.json", "w") as json_file:
-            json_file.write(model_json)
-        # serialize weights to HDF5
-        ann.save_weights(molName + "_AMM.h5")
-        print("Saved model for "+molName+" to disk")
+        # full_train_dss = [x[0] for x in test_ds]
+        # full_train_dss.append([x[0] for x in n_fold_ds])
+        # full_train_ds = cu.joinDataframes(full_train_dss)
+        # ann = getKerasNNModel(numcols)
+        # ann.fit(full_train_ds.iloc[:, 0:numcols], ((full_train_ds["active"])).astype(int) * 100, batch_size=500000, epochs=1000, callbacks=[early_stopping])
+        #
+        # # serialize model to JSON
+        # model_json = ann.to_json()
+        # with open(molName + "_AMM.json", "w") as json_file:
+        #     json_file.write(model_json)
+        # # serialize weights to HDF5
+        # ann.save_weights(molName + "_AMM.h5")
+        # print("Saved model for "+molName+" to disk")
 
 

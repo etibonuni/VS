@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.metrics import roc_curve, auc
 import scipy.stats as ss
 import matplotlib
-#matplotlib.use('Agg') # Must be before importing matplotlib.pyplot or pylab!
+matplotlib.use('agg') # Must be before importing matplotlib.pyplot or pylab!
 import matplotlib.pyplot as plt
 
 def getEnrichmentFactor(threshold, ds, sort_by="prob", truth="truth", ascending=False):

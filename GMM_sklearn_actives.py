@@ -40,8 +40,9 @@ datasetPortion=[1, 0.8, 0.6, 0.5, 0.3, 0.1, 0.05, 10]
 
 componentResults = []
 portionResults = []
+xvalResults=[]
 
-for molNdx in range(34, len(molfiles)):
+for molNdx in range(0, len(molfiles)):
     molName = molfiles[molNdx][1]  # [molfiles[molNdx].rfind("/", 0, -1)+1:-1]
     for portion in datasetPortion:
         try:
@@ -62,6 +63,8 @@ for molNdx in range(34, len(molfiles)):
                                                            selection_policy="RANDOM", return_type="SEPARATE", exclusion_list=test_paths)
 
             (folds_list, excl_list) = cu.split(n_fold_ds, folds, policy="RANDOM")
+
+            componentResults = []
 
             for components in componentsValues:
                 foldResults = []
@@ -140,6 +143,7 @@ for molNdx in range(34, len(molfiles)):
                     componentResults.append((molName, portion, components, 0, 0, 0, 0, 0, 0))
             #print(componentResults)
 
+            xvalResults.extend(componentResults)
             # Find best score
             aucs_rank = [x[5] for x in componentResults]
 
@@ -172,7 +176,21 @@ for molNdx in range(34, len(molfiles)):
         except:
             portionResults.append((molName, portion, 0, 0, 0 ))
 
-        print(componentResults)
-        print(portionResults)
+        f1 = open('results_gmm.txt', 'w')
+        print(xvalResults, file=f1)
+        print(portionResults, file=f1)
+        f1.close()
 
+        full_train_dss = [x[0] for x in test_ds]
+        full_train_dss.append([x[0] for x in n_fold_ds])
+        full_train_ds = cu.joinDataframes(full_train_dss)
+        G_a = GaussianMixture(n_components=best_components, covariance_type="full").fit(full_train_dss.iloc[:, 0:numcols],
+                                                                                        full_train_dss.iloc[:, numcols])
+
+        import pickle
+        mdlf = open(molName + "_GMM.pkl", "w")
+        pickle.dump(G_a, mdlf)
+        mdlf.close()
+
+        print("Saved model for "+molName+" to disk")
 

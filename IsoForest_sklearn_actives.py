@@ -25,10 +25,14 @@ componentResults = []
 xvalResults=[]
 portionResults = []
 
-for molNdx in range(6, len(molfiles)):
+done = ["aa2ar", "aldr", "comt", "fa10", "hivrt", "kith", "parp1", "pnph", "pygm", "thrb", "ace", "ampc", "dyr", "fgfr1", "hmdh", "lkha4", "pde5a", "pparg", "rxra", "try1", "aces", "andr", "egfr", "gcr", "hs90a", "mcr", "pgh1", "prgr", "sahh", "try1", "ada", "cdk2", "esr1", "hivpr", "inha", "mk14", "pgh2", "pur2", "src", "vgfr2"]
+for molNdx in range(0, len(molfiles)):
     molName = molfiles[molNdx][1]  # [molfiles[molNdx].rfind("/", 0, -1)+1:-1]
+    if molName in done:
+        continue
+
     for portion in datasetPortion:
-        #try:
+        try:
             t0 = time.time()
             descTypes = ["usr", "esh", "es5"]
             descType=descTypes[1]
@@ -112,41 +116,61 @@ for molNdx in range(6, len(molfiles)):
                     print("X-Validation returned no results. Skipping training...")
                     componentResults.append((molName, portion, param, 0, 0, 0, 0, 0, 0))
 
+        except:
+            componentResults.append((molName, portion, param, 0, 0, 0, 0, 0, 0))
 
 
+        xvalResults.extend(componentResults)
 
-            xvalResults.extend(componentResults)
+        # Find best score
+        aucs_rank = [x[5] for x in componentResults]
 
-            # Find best score
-            aucs_rank = [x[5] for x in componentResults]
+        best_estimators = params[np.argmax(aucs_rank)]
+        print("Best-score estimators no.: "+str(best_estimators))
 
-            best_estimators = params[np.argmax(aucs_rank)]
-            print("Best-score estimators no.: "+str(best_estimators))
+        train_ds = cu.lumpRecords(n_fold_ds)
+        clf = IsolationForest(n_estimators=best_estimators, n_jobs=-1)
 
-            train_ds = cu.lumpRecords(n_fold_ds)
-            clf = IsolationForest(n_estimators=best_estimators, n_jobs=-1)
+        train_a = train_ds[train_ds["active"] == True]
 
-            train_a = train_ds[train_ds["active"] == True]
+        clf.fit(train_a.iloc[:, 0:numcols], None)
 
-            clf.fit(train_a.iloc[:, 0:numcols], None)
+        results = pd.DataFrame()
 
-            results = pd.DataFrame()
+        results["score"] = [max(clf.decision_function((x[0].iloc[:, 0:numcols]))) for x in test_ds]
+        results["truth"] = [x[2] for x in test_ds]#np.array(test_ds)[:, 2]
 
-            results["score"] = [max(clf.decision_function((x[0].iloc[:, 0:numcols]))) for x in test_ds]
-            results["truth"] = [x[2] for x in test_ds]#np.array(test_ds)[:, 2]
+        auc = eval.plotSimROC(results["truth"], [results["score"]], molName+"[IsoForest, "+str(portion*100)+"%]", molName+"_IsoForest_sim_"+str(portion*100)+".pdf")
+        mean_ef = eval.getMeanEFs(np.array(results["truth"]), np.array([results["score"]]), eval_method="sim")
 
-            auc = eval.plotSimROC(results["truth"], [results["score"]], molName+"[1C-SVM, "+str(portion*100)+"%]", molName+"_1CSVM_sim_"+str(portion*100)+".pdf")
-            mean_ef = eval.getMeanEFs(np.array(results["truth"]), np.array([results["score"]]), eval_method="sim")
+        print("AUC(Sim)="+str(auc))
+        print("EF: ", mean_ef)
 
-            print("AUC(Sim)="+str(auc))
-            print("EF: ", mean_ef)
+        portionResults.append((molName, portion, best_estimators, auc, mean_ef))
+        t1 = time.time();
+        print("Time taken = "+str(t1-t0))
 
-            portionResults.append((molName, portion, best_estimators, auc, mean_ef))
-            t1 = time.time();
-            print("Time taken = "+str(t1-t0))
+        print(xvalResults)
+        print(portionResults)
 
-            print(xvalResults)
-            print(portionResults)
+        f1 = open('results_isoForest.txt', 'w')
+        print(xvalResults, file=f1)
+        print(portionResults, file=f1)
+        f1.close()
+
+    full_train_dss = [x[0] for x in test_ds]
+    full_train_dss.append([x[0] for x in n_fold_ds])
+    full_train_ds = cu.joinDataframes(full_train_dss)
+    clf = IsolationForest(n_estimators=best_estimators, n_jobs=-1)
+
+    G_a = clf.fit(full_train_ds.iloc[:, 0:numcols], full_train_ds.iloc[:, numcols])
+
+    import pickle
+    mdlf = open(molName + "_IsoForest.pkl", "wb")
+    pickle.dump(G_a, mdlf)
+    mdlf.close()
+
+    print("Saved model for "+molName+" to disk")
         #except:
         #    print("Eception occurred.")
         #    pass

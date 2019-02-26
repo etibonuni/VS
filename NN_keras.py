@@ -36,8 +36,7 @@ def getKerasNNModel(descDim, hiddenSize):
 
     return model
 
-params = [10, 50, 100]
-#params = [50]
+params = [100]
 datasetPortion = [1, 0.8, 0.6, 0.5, 0.3, 0.1, 0.05, 10]
 
 componentResults = []
@@ -47,7 +46,7 @@ portionResults = []
 from keras.callbacks import EarlyStopping
 early_stopping = EarlyStopping(monitor='accuracy', min_delta=0.001, patience=10, verbose=1)
 
-done = []
+done = ['fa10', 'rxra', 'mk14', 'hmdh', 'gcr']
 
 for molNdx in range(0, len(molfiles)):
     molName = molfiles[molNdx][1]  # [molfiles[molNdx].rfind("/", 0, -1)+1:-1]
@@ -60,7 +59,6 @@ for molNdx in range(0, len(molfiles)):
         try:
             print("Portion "+str(portion))
 
-            t0 = time.time()
             descTypes = ["usr", "esh", "es5"]
             descType = descTypes[1]
             if portion <= 1:
@@ -151,6 +149,9 @@ for molNdx in range(0, len(molfiles)):
 
             train_ds = cu.lumpRecords(n_fold_ds)
             ann = getKerasNNModel(numcols, best_estimators)
+            
+            t0 = time.time()
+
             ann.fit(train_ds.iloc[:, 0:numcols], ((train_ds["active"])).astype(int) * 100,
                     batch_size=500000,
                     epochs=1000, callbacks=[early_stopping])
@@ -164,39 +165,39 @@ for molNdx in range(0, len(molfiles)):
             auc = eval.plotSimROC(results["truth"], [results["score"]], molName + "[ANN, " + str(portion * 100) + "%]",
                                   molName + "_ANN_k_" + str(portion * 100) + ".pdf")
             mean_ef = eval.getMeanEFs(np.array(results["truth"]), np.array([results["score"]]))
+            t1 = time.time();
 
             # print("Final results, num components = ", str(components)+": ")
             print("AUC(Sim)=" + str(auc))
             print("EF: ", mean_ef)
 
-            portionResults.append((molName, portion, auc, mean_ef))
-            t1 = time.time();
+            portionResults.append((molName, portion, auc, mean_ef, t1-t0))
             print("Time taken = " + str(t1 - t0))
 
-            f1 = open('results_keras_tuning.txt', 'w')
+            f1 = open('results_keras_100.txt', 'w')
             print(xvalResults, file=f1)
             print(portionResults, file=f1)
             f1.close()
 
         except:
-            fe = opem("Errors.txt", "w")
+            fe = open("Errors.txt", "w")
             print("Error for "+molName+", potion="+str(portion))
 
         # full_train_ds = test_ds
         # full_train_ds.extend(n_fold_ds)
 
-    full_train_dss = [x[0] for x in test_ds]
-    full_train_dss.append([x[0] for x in n_fold_ds])
-    full_train_ds = cu.joinDataframes(full_train_dss)
-    ann = getKerasNNModel(numcols, best_estimators)
-    ann.fit(full_train_ds.iloc[:, 0:numcols], ((full_train_ds["active"])).astype(int) * 100, batch_size=500000, epochs=1000, callbacks=[early_stopping])
+#    full_train_dss = [x[0] for x in test_ds]
+#    full_train_dss.append([x[0] for x in n_fold_ds])
+#    full_train_ds = cu.joinDataframes(full_train_dss)
+#    ann = getKerasNNModel(numcols, best_estimators)
+#    ann.fit(full_train_ds.iloc[:, 0:numcols], ((full_train_ds["active"])).astype(int) * 100, batch_size=500000, epochs=1000, callbacks=[early_stopping])
 
-    # serialize model to JSON
-    model_json = ann.to_json()
-    with open(molName + "_ANN.json", "w") as json_file:
-        json_file.write(model_json)
+#    # serialize model to JSON
+#    model_json = ann.to_json()
+#    with open(molName + "_ANN.json", "w") as json_file:
+#        json_file.write(model_json)
     # serialize weights to HDF5
-    ann.save_weights(molName + "_ANN.h5")
-    print("Saved model for "+molName+" to disk")
+#    ann.save_weights(molName + "_ANN.h5")
+#    print("Saved model for "+molName+" to disk")
 
 

@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import conformer_utils as cu
 import os
+import time
 import evaluation as eval
 
 def get_immediate_subdirectories(a_dir):
@@ -156,12 +157,15 @@ for molNdx in range(0, len(molfiles)):
 
             #molName = molfiles[molNdx][1]#[molfiles[molNdx].rfind("/", 0, -1)+1:-1]
             if len(train_ds)>best_components:
+                t0 = time.time()
                 G_a = GaussianMixture(n_components=best_components, covariance_type="full").fit(train_ds.iloc[:, 0:numcols], train_ds.iloc[:, numcols])
                 results = pd.DataFrame()
                 results["a_score"] = [G_a.score(x[0].iloc[:, 0:numcols]) for x in test_ds]
                 results["truth"] = [x[2] for x in test_ds]#np.array(test_ds)[:, 2]
                 auc = eval.plotSimROC(results["truth"], [results["a_score"]], molName+"[GMM-"+str(components)+" components(Similarity), "+str(portion*100)+"%]", molName+"_GMM_sim_"+str(components)+"_"+str(portion*100)+".pdf")
+                auc_rank = eval.plotRankROC(results["truth"], [results["a_score"]], molName+"[GMM-"+str(components)+" components(Similarity), "+str(portion*100)+"%]", molName+"_GMM_sim_"+str(components)+"_"+str(portion*100)+".pdf")
                 mean_ef = eval.getMeanEFs(np.array(results["truth"]), np.array([results["a_score"]]))
+                t1 = time.time()
             else:
                 auc=0
                 mean_ef=0
@@ -172,25 +176,25 @@ for molNdx in range(0, len(molfiles)):
             print("AUC="+str(auc))
             print("EF: ", mean_ef)
 
-            portionResults.append((molName, portion, best_components, auc, mean_ef))
+            portionResults.append((molName, portion, best_components, auc, auc_rank, mean_ef, t1-t0))
         except:
-            portionResults.append((molName, portion, 0, 0, 0 ))
+            portionResults.append((molName, portion, 0, 0, 0, 0, 0 ))
 
         f1 = open('results_gmm.txt', 'w')
         print(xvalResults, file=f1)
         print(portionResults, file=f1)
         f1.close()
 
-        full_train_dss = [x[0] for x in test_ds]
-        full_train_dss.append([x[0] for x in n_fold_ds])
-        full_train_ds = cu.joinDataframes(full_train_dss)
-        G_a = GaussianMixture(n_components=best_components, covariance_type="full").fit(full_train_dss.iloc[:, 0:numcols],
-                                                                                        full_train_dss.iloc[:, numcols])
-
-        import pickle
-        mdlf = open(molName + "_GMM.pkl", "w")
-        pickle.dump(G_a, mdlf)
-        mdlf.close()
-
-        print("Saved model for "+molName+" to disk")
+        # full_train_dss = [x[0] for x in test_ds]
+        # full_train_dss.append([x[0] for x in n_fold_ds])
+        # full_train_ds = cu.joinDataframes(full_train_dss)
+        # G_a = GaussianMixture(n_components=best_components, covariance_type="full").fit(full_train_dss.iloc[:, 0:numcols],
+        #                                                                                 full_train_dss.iloc[:, numcols])
+        #
+        # import pickle
+        # mdlf = open(molName + "_GMM.pkl", "w")
+        # pickle.dump(G_a, mdlf)
+        # mdlf.close()
+        #
+        # print("Saved model for "+molName+" to disk")
 

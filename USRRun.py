@@ -144,30 +144,31 @@ for molNdx in range(0, len(molfiles)):
         auc_rank_usr=0
         mean_ef_usr=0
 
-    try:
-        print("Processing Electroshape 4-d")
-        sc = initSpark()
-        (sim_es_ds, sim_paths_es) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="esh", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
-        simobj_es = scls.USRMoleculeSim(sim_es_ds, sim_paths_es)
-        usr_results_esh = np.array(simobj_es.runSparkScreening(sc)).transpose()
-        sc.stop()
-        #plotSimROC(sim_es_ds, usr_results_esh, "esh_plot_"+molfiles[molNdx][1]+".pdf")
-        # (auc_esh, mean_ef_esh) = eval.plotSimROC([l[2] for l in sim_ds], usr_results_esh,
-        #                                  molName + "ElectroShape 4-d results",
-        #                                  "esh_plot_"+molName + ".pdf")
-
-        auc_esh = eval.plotSimROC([l[2] for l in sim_ds], usr_results_esh,
-                                         molName + " ElectroShape 4-d Sim ROC",
-                                         "esh_sim_"+molName + ".pdf")
-        auc_rank_esh = eval.plotRankROC([l[2] for l in sim_ds], usr_results_esh,
-                                         molName + " ElectroShape 4-d Rank ROC",
-                                         "esh_rank_"+molName + ".pdf")
-        mean_ef_esh = eval.getMeanEFs([l[2] for l in sim_ds], usr_results_esh)
-    except:
-        print("Error processing Electroshape 4-d for " + molfiles[molNdx][1])
-        auc_esh=0
-        auc_rank_esh=0
-        mean_ef_esh=0
+#    try:
+#        print("Processing Electroshape 4-d")
+#        sc = initSpark()
+#        (sim_es_ds, sim_paths_es) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="esh", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
+#        simobj_es = scls.USRMoleculeSim(sim_es_ds, sim_paths_es)
+#        usr_results_esh = np.array(simobj_es.runSparkScreening(sc)).transpose()
+#        sc.stop()
+#        #plotSimROC(sim_es_ds, usr_results_esh, "esh_plot_"+molfiles[molNdx][1]+".pdf")
+#        # (auc_esh, mean_ef_esh) = eval.plotSimROC([l[2] for l in sim_ds], usr_results_esh,
+#        #                                  molName + "ElectroShape 4-d results",
+#        #                                  "esh_plot_"+molName + ".pdf")
+#
+#        auc_esh = eval.plotSimROC([l[2] for l in sim_ds], usr_results_esh,
+#                                         molName + " ElectroShape 4-d Sim ROC",
+#                                         "esh_sim_"+molName + ".pdf")
+#        auc_rank_esh = eval.plotRankROC([l[2] for l in sim_ds], usr_results_esh,
+#                                         molName + " ElectroShape 4-d Rank ROC",
+#                                         "esh_rank_"+molName + ".pdf")
+#        mean_ef_esh = eval.getMeanEFs([l[2] for l in sim_ds], usr_results_esh)
+#    except:
+#        print("Error processing Electroshape 4-d for " + molfiles[molNdx][1])
+        
+    auc_esh=0
+    auc_rank_esh=0
+    mean_ef_esh=0
 
     try:
         print("Processing Electroshape 5-d")

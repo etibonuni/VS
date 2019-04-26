@@ -33,7 +33,6 @@ for molNdx in range(0, len(molfiles)):
 
     for portion in datasetPortion:
         try:
-            t0 = time.time()
             descTypes = ["usr", "esh", "es5"]
             descType=descTypes[1]
             if portion <= 1:
@@ -129,6 +128,8 @@ for molNdx in range(0, len(molfiles)):
         print("Best-score estimators no.: "+str(best_estimators))
 
         train_ds = cu.lumpRecords(n_fold_ds)
+
+        t0 = time.time()
         clf = IsolationForest(n_estimators=best_estimators, n_jobs=-1)
 
         train_a = train_ds[train_ds["active"] == True]
@@ -140,15 +141,23 @@ for molNdx in range(0, len(molfiles)):
         results["score"] = [max(clf.decision_function((x[0].iloc[:, 0:numcols]))) for x in test_ds]
         results["truth"] = [x[2] for x in test_ds]#np.array(test_ds)[:, 2]
 
+        auc = eval.plotSimROC(results["truth"], [results["score"]],
+                              molName + "[IsoForest, " + str(portion * 100) + "%]",
+                              molName + "_IsoForest_sim_" + str(portion * 100) + ".pdf")
+        auc_rank = eval.plotRankROC(results["truth"], [results["score"]],
+                                    molName + "[IsoForest, " + str(portion * 100) + "%]",
+                                    molName + "_IsoForest_rank_" + str(portion * 100) + ".pdf")
+
         auc = eval.plotSimROC(results["truth"], [results["score"]], molName+"[IsoForest, "+str(portion*100)+"%]", molName+"_IsoForest_sim_"+str(portion*100)+".pdf")
         mean_ef = eval.getMeanEFs(np.array(results["truth"]), np.array([results["score"]]), eval_method="sim")
 
         print("AUC(Sim)="+str(auc))
         print("EF: ", mean_ef)
 
-        portionResults.append((molName, portion, best_estimators, auc, mean_ef))
         t1 = time.time();
         print("Time taken = "+str(t1-t0))
+
+        portionResults.append((molName, portion, best_estimators, auc, auc_rank, mean_ef, t1-t0))
 
         print(xvalResults)
         print(portionResults)

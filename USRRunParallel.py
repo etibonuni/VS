@@ -17,7 +17,7 @@ def get_immediate_subdirectories(a_dir):
 
 
 #homeDir = "/home/etienne/MScAI/dissertation/Conformers"
-homeDir = "/home/ubuntu/data_vol/projects/dissertation/Conformers"
+homeDir = "/home/ebon0023/projects/dissertation/Conformers"
 #molfiles = get_immediate_subdirectories(homeDir)
 molfiles = [[homeDir+"/"+x+"/",x] for x in get_immediate_subdirectories(homeDir)]
 print(molfiles)

@@ -3,6 +3,7 @@ import numpy as np
 import conformer_utils as cu
 import pandas as pd
 from sklearn.metrics import roc_curve, auc
+import time
 
 import matplotlib
 matplotlib.use('Agg') # Must be before importing matplotlib.pyplot or pylab!
@@ -96,13 +97,14 @@ for molNdx in range(0, len(molfiles)):
 
     molName = molfiles[molNdx][1]
     try:
+        t0 = time.time()
         print("Processing "+molfiles[molNdx][0])
         print("Processing USR")
 
         (sim_ds, sim_paths) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="usr", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
         simobj = scls.USRMoleculeSimParallel(sim_ds, sim_paths)
-        usr_results = np.array(simobj.runSparkScreening(sc)).transpose()
-        sc.stop()
+        usr_results = np.array(simobj.runScreening(50)).transpose()
+
         #plotSimROC(sim_ds, usr_results, "usr_plot_"+molfiles[molNdx][1]+".pdf")
         auc_usr = eval.plotSimROC([l[2] for l in sim_ds], usr_results,
                                          molName + " USR Sim ROC",
@@ -111,6 +113,8 @@ for molNdx in range(0, len(molfiles)):
                                          molName + " USR Rank ROC",
                                          "usr_rank_"+molName + ".pdf")
         mean_ef_usr = eval.getMeanEFs([l[2] for l in sim_ds], usr_results)
+        t1 = time.time();
+        t_usr = t1-t0
     except:
         print("Error processing USR for " + molfiles[molNdx][1])
         auc_usr=0
@@ -145,11 +149,11 @@ for molNdx in range(0, len(molfiles)):
 
     try:
         print("Processing Electroshape 5-d")
-
+        t0=time.time()
         (sim_es5_ds, sim_paths_es5) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="es5", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
         simobj_es5 = scls.USRMoleculeSimParallel(sim_es5_ds, sim_paths_es5)
-        usr_results_es5 = np.array(simobj_es5.runSparkScreening(sc)).transpose()
-        sc.stop()
+        usr_results_es5 = np.array(simobj_es5.runScreening(50)).transpose()
+
         #plotSimROC(sim_es5_ds, usr_results_es5, "es5_plot_"+molfiles[molNdx][1]+".pdf")
         # (auc_es5, mean_ef_es5) = eval.plotSimROC([l[2] for l in sim_ds], usr_results_es5,
         #                                  molName + "ElectroShape 5-d results",
@@ -162,13 +166,17 @@ for molNdx in range(0, len(molfiles)):
                                          molName + " ElectroShape 5-d Rank ROC",
                                          "es5_rank_"+molName + ".pdf")
         mean_ef_es5 = eval.getMeanEFs([l[2] for l in sim_ds], usr_results_es5)
+        t1 = time.time();
+        t_es5 = t1-t0
     except:
         print("Error processing Electroshape 5-d for " + molfiles[molNdx][1])
         auc_es5=0
         auc_rank_es5=0
         mean_ef_es5=0
 
-    results.append([molName, auc_usr, auc_rank_usr, mean_ef_usr, auc_esh, auc_rank_esh, mean_ef_esh, auc_es5, auc_rank_es5, mean_ef_es5])
+    results.append([molName, auc_usr, auc_rank_usr, mean_ef_usr, t_usr, auc_esh, auc_rank_esh, mean_ef_esh, 0, auc_es5, auc_rank_es5, mean_ef_es5, t_es5])
     print("Results:")
-
-print(results)
+    print(results)
+    f1 = open('results_usr_parallel.txt', 'w')
+    print(results, file=f1)
+    f1.close()

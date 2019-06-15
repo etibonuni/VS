@@ -376,7 +376,7 @@ class USRMoleculeSimParallel(MoleculeSimilarity):
         resultsMol = [np.max(manhattanSim(candidate[1], self.actives[i])) for i in range(0, len(self.actives))]
         return resultsMol
 
-    def runSparkScreening(self, chunkSize):
+    def runScreening(self, chunkSize):
         from multiprocessing import Pool
 
         # activeRange = sc.range(0, sum([self.conformers[x][2] for x in range(0, len(self.conformers))]))

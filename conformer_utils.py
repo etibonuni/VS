@@ -69,7 +69,8 @@ def argsort(seq):
 # num_actives: the number of actives to load. If <= 1 it is taken as a percentage of the total number of actives
 # active_decoy_ratio: The number of decoys to load as a fraction of the number of actives. -1 to maintain the population ratio of decoys to actives
 # selection_policy: "RANDOM" | "SEQUENTIAL". If SEQUENTIAL, molecules will be loaded in order starting at the first one
-# return_type: "SEPARATE" | "LUMPED". If SEPARATE, a separate Pandas DataFrame with conformer description for each molecule will be returned in a list along with the path for each descriptor file. If LUMPED then all the conformer descriptors for all the loaded molecules will be returned in a single DataFrame.
+# return_type: "SEPARATE" | "LUMPED". If SEPARATE, a separate Pandas DataFrame with conformer description for each molecule will be returned in a list along with the path for each descriptor file.
+# If LUMPED then all the conformer descriptors for all the loaded molecules will be returned in a single DataFrame.
 def loadDescriptors(path, num_actives, active_decoy_ratio=1, dtype="usr", selection_policy="SEQUENTIAL",
                     return_type="SEPARATE", exclusion_list=None):
     active_filenames = glob(path + "active_*." + dtype)

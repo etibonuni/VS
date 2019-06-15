@@ -359,6 +359,52 @@ class USRMoleculeSim(MoleculeSimilarity):
 
          return c.collect()
 
+class USRMoleculeSimParallel(MoleculeSimilarity):
+
+    def getSim(self, mol1, mol2):
+        mol1_confs = self.conformers[mol1][0][:, 0:self.numcols]
+        mol2_confs = self.conformers[mol2][0][:, 0:self.numcols]
+        # sims=[manhattanSim(c1, mol2_confs) for c1 in mol1_confs]
+
+        sims = manhattanSim(mol1_confs, mol2_confs)
+
+        return np.max(sims)
+
+    def doSim(self, candidate, actives_bc):
+        # resultsMol = [simObj_bc.value.getSim(templateNdx, molNdx) for molNdx in range(0, len(simObj_bc.value.conformers))]
+
+        resultsMol = [np.max(manhattanSim(candidate[1], actives_bc.value[i])) for i in range(0, len(actives_bc.value))]
+        return resultsMol
+
+    def runSparkScreening(self, chunkSize):
+        from multiprocessing import Pool
+
+        # activeRange = sc.range(0, sum([self.conformers[x][2] for x in range(0, len(self.conformers))]))
+
+        actives = [np.array(self.conformers[i][0].iloc[:, 0:self.numcols]) for i in range(0, len(self.conformers)) if
+                   self.conformers[i][2] == True]
+
+        candidates = [(i, np.array(self.conformers[i][0].iloc[:, 0:self.numcols])) for i in range(0, len(self.conformers))]
+
+        #actives_bc = sc.broadcast(actives)
+
+        #c = candidates.map(lambda x: self.doSim(x, actives_bc))
+
+        p = Pool(chunkSize)
+
+        c=p.map(doSim, candidates, chunkSize)
+        # Sort in Spark causes crash -> perform sorting locally
+        # c2 = c.sortByKey(ascending=True)
+
+        # c3 = c2.values()
+        # c = c.collect()
+
+        # order = [c[i][0] for i in range(0, len(c))]
+
+        # v = [c[i][1] for i in range(0, len(c))]
+
+        return c
+
 class USR_MNPSim(MoleculeSimilarity):
     def __init__(self, conformers, paths):
         super(USR_MNPSim, self).__init__( conformers, paths)

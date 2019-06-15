@@ -108,10 +108,10 @@ for molNdx in range(0, len(molfiles)):
         #plotSimROC(sim_ds, usr_results, "usr_plot_"+molfiles[molNdx][1]+".pdf")
         auc_usr = eval.plotSimROC([l[2] for l in sim_ds], usr_results,
                                          molName + " USR Sim ROC",
-                                         "usr_sim_"+molName + ".pdf")
+                                         "results/usr_sim_"+molName + ".pdf")
         auc_rank_usr = eval.plotRankROC([l[2] for l in sim_ds], usr_results,
                                          molName + " USR Rank ROC",
-                                         "usr_rank_"+molName + ".pdf")
+                                         "results/usr_rank_"+molName + ".pdf")
         mean_ef_usr = eval.getMeanEFs([l[2] for l in sim_ds], usr_results)
         t1 = time.time();
         t_usr = t1-t0
@@ -161,10 +161,10 @@ for molNdx in range(0, len(molfiles)):
 
         auc_es5 = eval.plotSimROC([l[2] for l in sim_ds], usr_results_es5,
                                          molName + " ElectroShape 5-d Sim ROC",
-                                         "es5_sim_"+molName + ".pdf")
+                                         "results/es5_sim_"+molName + ".pdf")
         auc_rank_es5 = eval.plotRankROC([l[2] for l in sim_ds], usr_results_es5,
                                          molName + " ElectroShape 5-d Rank ROC",
-                                         "es5_rank_"+molName + ".pdf")
+                                         "results/es5_rank_"+molName + ".pdf")
         mean_ef_es5 = eval.getMeanEFs([l[2] for l in sim_ds], usr_results_es5)
         t1 = time.time();
         t_es5 = t1-t0

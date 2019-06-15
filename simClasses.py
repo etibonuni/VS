@@ -370,10 +370,10 @@ class USRMoleculeSimParallel(MoleculeSimilarity):
 
         return np.max(sims)
 
-    def doSim(self, candidate, actives_bc):
+    def doSim(self, candidate):
         # resultsMol = [simObj_bc.value.getSim(templateNdx, molNdx) for molNdx in range(0, len(simObj_bc.value.conformers))]
 
-        resultsMol = [np.max(manhattanSim(candidate[1], actives_bc.value[i])) for i in range(0, len(actives_bc.value))]
+        resultsMol = [np.max(manhattanSim(candidate[1], self.actives[i])) for i in range(0, len(self.actives))]
         return resultsMol
 
     def runSparkScreening(self, chunkSize):
@@ -381,7 +381,7 @@ class USRMoleculeSimParallel(MoleculeSimilarity):
 
         # activeRange = sc.range(0, sum([self.conformers[x][2] for x in range(0, len(self.conformers))]))
 
-        actives = [np.array(self.conformers[i][0].iloc[:, 0:self.numcols]) for i in range(0, len(self.conformers)) if
+        self.actives = [np.array(self.conformers[i][0].iloc[:, 0:self.numcols]) for i in range(0, len(self.conformers)) if
                    self.conformers[i][2] == True]
 
         candidates = [(i, np.array(self.conformers[i][0].iloc[:, 0:self.numcols])) for i in range(0, len(self.conformers))]

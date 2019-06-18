@@ -391,8 +391,8 @@ class USRMoleculeSimParallel(MoleculeSimilarity):
         #c = candidates.map(lambda x: self.doSim(x, actives_bc))
 
         p = Pool(chunkSize)
-
-        c=p.map(doSim, candidates, chunkSize)
+        
+        c=p.map(self.doSim, candidates, chunkSize)
         # Sort in Spark causes crash -> perform sorting locally
         # c2 = c.sortByKey(ascending=True)
 

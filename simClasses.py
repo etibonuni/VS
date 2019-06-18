@@ -372,7 +372,9 @@ class USRMoleculeSimParallel(MoleculeSimilarity):
 
     def doSim(self, candidate):
         # resultsMol = [simObj_bc.value.getSim(templateNdx, molNdx) for molNdx in range(0, len(simObj_bc.value.conformers))]
-
+#        print("Size=" + str(len(candidate)))
+#        print("Candidate: " + str(candidate[0]))
+	
         resultsMol = [np.max(manhattanSim(candidate[1], self.actives[i])) for i in range(0, len(self.actives))]
         return resultsMol
 
@@ -381,7 +383,7 @@ class USRMoleculeSimParallel(MoleculeSimilarity):
 
         # activeRange = sc.range(0, sum([self.conformers[x][2] for x in range(0, len(self.conformers))]))
 
-        self.actives = [np.array(self.conformers[i][0].iloc[:, 0:self.numcols]) for i in range(0, len(self.conformers)) if
+        self.actives = [np.array(self.conformers[i][0].iloc[0:1, 0:self.numcols]) for i in range(0, len(self.conformers)) if
                    self.conformers[i][2] == True]
 
         candidates = [(i, np.array(self.conformers[i][0].iloc[:, 0:self.numcols])) for i in range(0, len(self.conformers))]
@@ -390,9 +392,10 @@ class USRMoleculeSimParallel(MoleculeSimilarity):
 
         #c = candidates.map(lambda x: self.doSim(x, actives_bc))
 
+        print("Using chunckzize="+str(chunkSize))
         p = Pool(chunkSize)
 
-        c=p.map(doSim, candidates, chunkSize)
+        c=p.map(self.doSim, candidates)
         # Sort in Spark causes crash -> perform sorting locally
         # c2 = c.sortByKey(ascending=True)
 
@@ -402,6 +405,7 @@ class USRMoleculeSimParallel(MoleculeSimilarity):
         # order = [c[i][0] for i in range(0, len(c))]
 
         # v = [c[i][1] for i in range(0, len(c))]
+        p.close()
 
         return c
 

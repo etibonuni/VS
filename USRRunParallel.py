@@ -20,7 +20,9 @@ def get_immediate_subdirectories(a_dir):
 #homeDir = "/home/etienne/MScAI/dissertation/Conformers"
 homeDir = "/home/ebon0023/projects/dissertation/Conformers"
 #molfiles = get_immediate_subdirectories(homeDir)
-molfiles = [[homeDir+"/"+x+"/",x] for x in get_immediate_subdirectories(homeDir)]
+#done = ["try1", "mk14", "aa2ar", "rxra"]
+done = ["aces", "ace", "ada", "aldr", "ampc", "andr", "cdk2", "comt", "dyr", "egfr", "esr1", "fa10", "fgfr1", "gcr", "hivpr", "hivrt", "hmdh", "hs90a", "inha", "kith", "lkha4", "mcr", "nram", "parp1", "pde5a", "pgh1", "pgh2", "pnph", "pparg", "prgr", "pur2", "pygm", "sahh", "src", "thrb", "vgfr2"]
+molfiles = [[homeDir+"/"+x+"/",x] for x in get_immediate_subdirectories(homeDir) if x not in done]
 print(molfiles)
 
 
@@ -96,30 +98,29 @@ results = []
 for molNdx in range(0, len(molfiles)):
 
     molName = molfiles[molNdx][1]
-    try:
-        t0 = time.time()
-        print("Processing "+molfiles[molNdx][0])
-        print("Processing USR")
+#    try:
+    t0 = time.time()
+    print("Processing "+molfiles[molNdx][0])
+    print("Processing USR")
+    (sim_ds, sim_paths) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="usr", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
+    simobj = scls.USRMoleculeSimParallel(sim_ds, sim_paths)
+    usr_results = np.array(simobj.runScreening(50)).transpose()
 
-        (sim_ds, sim_paths) = cu.loadDescriptors(molfiles[molNdx][0], numActives, dtype="usr", active_decoy_ratio=-1, selection_policy="SEQUENTIAL", return_type="SEPARATE")
-        simobj = scls.USRMoleculeSimParallel(sim_ds, sim_paths)
-        usr_results = np.array(simobj.runScreening(50)).transpose()
-
-        #plotSimROC(sim_ds, usr_results, "usr_plot_"+molfiles[molNdx][1]+".pdf")
-        auc_usr = eval.plotSimROC([l[2] for l in sim_ds], usr_results,
+    #plotSimROC(sim_ds, usr_results, "usr_plot_"+molfiles[molNdx][1]+".pdf")
+    auc_usr = eval.plotSimROC([l[2] for l in sim_ds], usr_results,
                                          molName + " USR Sim ROC",
                                          "results/usr_sim_"+molName + ".pdf")
-        auc_rank_usr = eval.plotRankROC([l[2] for l in sim_ds], usr_results,
+    auc_rank_usr = eval.plotRankROC([l[2] for l in sim_ds], usr_results,
                                          molName + " USR Rank ROC",
                                          "results/usr_rank_"+molName + ".pdf")
-        mean_ef_usr = eval.getMeanEFs([l[2] for l in sim_ds], usr_results)
-        t1 = time.time();
-        t_usr = t1-t0
-    except:
-        print("Error processing USR for " + molfiles[molNdx][1])
-        auc_usr=0
-        auc_rank_usr=0
-        mean_ef_usr=0
+    mean_ef_usr = eval.getMeanEFs([l[2] for l in sim_ds], usr_results)
+    t1 = time.time();
+    t_usr = t1-t0
+#    except:
+#        print("Error processing USR for " + molfiles[molNdx][1])
+#        auc_usr=0
+#        auc_rank_usr=0
+#        mean_ef_usr=0
 
 #    try:
 #        print("Processing Electroshape 4-d")
@@ -174,7 +175,13 @@ for molNdx in range(0, len(molfiles)):
         auc_rank_es5=0
         mean_ef_es5=0
 
-    results.append([molName, auc_usr, auc_rank_usr, mean_ef_usr, t_usr, auc_esh, auc_rank_esh, mean_ef_esh, 0, auc_es5, auc_rank_es5, mean_ef_es5, t_es5])
+    resultLine = [molName, auc_usr, auc_rank_usr, mean_ef_usr, t_usr, auc_esh, auc_rank_esh, mean_ef_esh, 0, auc_es5, auc_rank_es5, mean_ef_es5, t_es5]
+
+    f1 = open("results/results_"+molName+".txt", "w")
+    print(resultLine, file=f1)
+    f1.close()
+
+    results.append(resultLine)
     print("Results:")
     print(results)
     f1 = open('results_usr_parallel.txt', 'w')

@@ -185,16 +185,16 @@ for molNdx in range(0, len(molfiles)):
         print(portionResults, file=f1)
         f1.close()
 
-        # full_train_dss = [x[0] for x in test_ds]
-        # full_train_dss.append([x[0] for x in n_fold_ds])
-        # full_train_ds = cu.joinDataframes(full_train_dss)
-        # G_a = GaussianMixture(n_components=best_components, covariance_type="full").fit(full_train_dss.iloc[:, 0:numcols],
-        #                                                                                 full_train_dss.iloc[:, numcols])
-        #
-        # import pickle
-        # mdlf = open(molName + "_GMM.pkl", "w")
-        # pickle.dump(G_a, mdlf)
-        # mdlf.close()
-        #
-        # print("Saved model for "+molName+" to disk")
+        full_train_dss = [x[0] for x in test_ds]
+        full_train_dss.append([x[0] for x in n_fold_ds])
+        full_train_ds = cu.joinDataframes(full_train_dss)
+        G_a = GaussianMixture(n_components=best_components, covariance_type="full").fit(full_train_ds.iloc[:, 0:numcols],
+                                                                                        full_train_ds.iloc[:, numcols])
+       
+        import pickle
+        mdlf = open(molName + "_GMM.pkl", "wb")
+        pickle.dump(G_a, mdlf)
+        mdlf.close()
+       
+        print("Saved model for "+molName+" to disk")
 

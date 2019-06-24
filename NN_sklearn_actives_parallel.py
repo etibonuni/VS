@@ -6,6 +6,7 @@ import conformer_utils as cu
 import os
 import time
 import evaluation as eval
+from multiprocessing import Pool
 
 def get_immediate_subdirectories(a_dir):
     return [name for name in os.listdir(a_dir)
@@ -15,12 +16,12 @@ homeDir = os.environ["DISSERTATION_HOME"]+"/Conformers/"
 
 molfiles = [[homeDir+"/"+x+"/",x] for x in get_immediate_subdirectories(homeDir)]
 
-datasetPortion=[1, 0.8, 0.6, 0.5, 0.3, 0.1, 0.05, 10]
 
-componentResults = []
-portionResults = []
 
-for molNdx in range(0, len(molfiles)):
+def doMolGMM(molNdx):
+    componentResults = []
+    portionResults = []
+
     molName = molfiles[molNdx][1]  # [molfiles[molNdx].rfind("/", 0, -1)+1:-1]
     for portion in datasetPortion:
         t0 = time.time()
@@ -61,7 +62,7 @@ for molNdx in range(0, len(molfiles)):
             numcols = train_ds.shape[1]-2
 
 
-            ann = MLPRegressor()
+            ann = MLPRegressor(max_iter=1000, early_stopping=True)
 
             ann.fit(train_ds.iloc[:, 0:numcols], ((train_ds["active"])).astype(int)*100)
 
@@ -101,7 +102,7 @@ for molNdx in range(0, len(molfiles)):
 
 
         train_ds = cu.lumpRecords(n_fold_ds)
-        ann = MLPRegressor(max_iter=500)
+        ann = MLPRegressor(max_iter=1000, early_stopping=True)
         ann.fit(train_ds.iloc[:, 0:numcols], ((train_ds["active"])).astype(int) * 100)
 
         results = pd.DataFrame()
@@ -109,15 +110,38 @@ for molNdx in range(0, len(molfiles)):
         results["score"] = [max(ann.predict(x[0].iloc[:, 0:numcols])) for x in test_ds]
         results["truth"] = [x[2] for x in test_ds]#np.array(test_ds)[:, 2]
 
-        auc = eval.plotSimROC(results["truth"], [results["score"]], molName+"[ANN, "+str(portion*100)+"%]", molName+"_ANN_sim_"+str(portion*100)+".pdf")
+        auc_sim = eval.plotSimROC(results["truth"], [results["score"]],
+                              molName+"[ANN, "+str(portion*100)+"%]",
+                              "results/"+molName+"_ANN_sim_"+str(portion*100)+".pdf")
+        auc_rank = eval.plotRankROC(results["truth"], [results["score"]],
+                                    molName + "[ANN-" + str(portion * 100) + "%]",
+                                    "results/" + molName + "_ANN_rank_" + str(portion*100) + ".pdf")
+
         mean_ef = eval.getMeanEFs(np.array(results["truth"]), np.array([results["score"]]))
 
         print("AUC(Sim)="+str(auc))
         print("EF: ", mean_ef)
-
-        portionResults.append((molName, portion, auc, mean_ef))
         t1 = time.time();
+
+        portionResults.append((molName, portion, auc_sim, auc_rank, mean_ef, (t1-t0)))
+
         print("Time taken = "+str(t1-t0))
 
         print(componentResults)
         print(portionResults)
+
+        f1 = open("results/results_ann_"+molName+".txt", 'w')
+        print(componentResults, file=f1)
+        print(portionResults, file=f1)
+        f1.close()
+
+
+datasetPortion=[1, 0.8, 0.6, 0.5, 0.3, 0.1, 0.05, 10]
+
+componentResults = []
+portionResults = []
+
+numProcesses=4
+p = Pool(numProcesses)
+
+p.map(doMolGMM, range(0, len(molfiles)));

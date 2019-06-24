@@ -12,163 +12,166 @@ def get_immediate_subdirectories(a_dir):
             if os.path.isdir(os.path.join(a_dir, name))]
 
 homeDir = os.environ["DISSERTATION_HOME"]+"/Conformers/"
-done=["aa2ar", "ace", "ada", "aldr", "ampc", "andr", "cdk2", "comt", "dyr", "esr1", "fa10", "fgfr1", "gcr", "hivrt", "hmdh", "hs90a", "inha", "kith", "lkha4", "mcr", "mk14", "nram", "parp1", "pde5a", "pgh1", "pgh2", "pnph", "prgr", "pur2", "pygm", "rxra", "sahh", "try1", "vgfr2"]
-
+#done=["aa2ar", "ace", "ada", "aldr", "ampc", "andr", "cdk2", "comt", "dyr", "esr1", "fa10", "fgfr1", "gcr", "hivrt", "hmdh", "hs90a", "inha", "kith", "lkha4", "mcr", "mk14", "nram", "parp1", "pde5a", "pgh1", "pgh2", "pnph", "prgr", "pur2", "pygm", "rxra", "sahh", "try1", "vgfr2"]
+done=[]
 
 molfiles = [[homeDir+"/"+x+"/",x] for x in get_immediate_subdirectories(homeDir) if x not in done]
 
 print(molfiles)
 
 def doMolGMM(molNdx):
+    portionResults=[]
+    xvalResults=[]
     molName = molfiles[molNdx][1]  # [molfiles[molNdx].rfind("/", 0, -1)+1:-1]
     for portion in datasetPortion:
-        try:
-            descTypes = ["usr", "esh", "es5"]
-            descType = descTypes[1]
-            if portion <= 1:
-                print("Loading " + str(portion * 100) + "% of " + molfiles[molNdx][1])
-            else:
-                print("Loading " + str(portion) + " actives from " + molfiles[molNdx][1])
+ #       try:
+        descTypes = ["usr", "esh", "es5"]
+        descType = descTypes[1]
+        if portion <= 1:
+            print("Loading " + str(portion * 100) + "% of " + molfiles[molNdx][1])
+        else:
+            print("Loading " + str(portion) + " actives from " + molfiles[molNdx][1])
 
-            (test_ds, test_paths) = cu.loadDescriptors(molfiles[molNdx][0], portion * 0.01, dtype=descType,
-                                                       active_decoy_ratio=-1, selection_policy="RANDOM",
-                                                       return_type="SEPERATE")
-            numcols = test_ds[0][0].shape[1] - 2
+        (test_ds, test_paths) = cu.loadDescriptors(molfiles[molNdx][0], portion * 0.2, dtype=descType,
+                                                   active_decoy_ratio=-1, selection_policy="RANDOM",
+                                                   return_type="SEPERATE")
+        numcols = test_ds[0][0].shape[1] - 2
 
-            componentsValues = [1, 10, 50, 100, 1000]
-            folds = 5
+        componentsValues = [1, 10, 50, 100, 1000]
+        folds = 5
 
-            (n_fold_ds, n_fold_paths) = cu.loadDescriptors(molfiles[molNdx][0], portion * 0.01, dtype=descType,
+        (n_fold_ds, n_fold_paths) = cu.loadDescriptors(molfiles[molNdx][0], portion * 0.8, dtype=descType,
                                                            active_decoy_ratio=-1,
                                                            selection_policy="RANDOM", return_type="SEPARATE",
                                                            exclusion_list=test_paths)
 
-            (folds_list, excl_list) = cu.split(n_fold_ds, folds, policy="RANDOM")
+        (folds_list, excl_list) = cu.split(n_fold_ds, folds, policy="RANDOM")
 
-            componentResults = []
+        componentResults = []
 
-            for components in componentsValues:
-                foldResults = []
+        for components in componentsValues:
+            foldResults = []
 
-                for fold in range(0, folds):
-                    val_ds = folds_list[fold]
+            for fold in range(0, folds):
+                val_ds = folds_list[fold]
 
-                    train_ds = None;
+                train_ds = None;
 
-                    for i in range(0, folds):
-                        if i != fold:
-                            if train_ds is None:
-                                train_ds = [r[0].iloc[0:1,:] for r in folds_list[i]]
-                            else:
-                                train_ds.append([r[0].iloc[0:1,:]  for r in folds_list[i]])
+                for i in range(0, folds):
+                    if i != fold:
+                        if train_ds is None:
+                            train_ds = [r[0].iloc[0:1,:] for r in folds_list[i]]
+                        else:
+                            train_ds.append([r[0].iloc[0:1,:]  for r in folds_list[i]])
 
-                    train_ds = cu.joinDataframes(train_ds)
+                train_ds = cu.joinDataframes(train_ds)
 
-                    numcols = train_ds.shape[1] - 2
+                numcols = train_ds.shape[1] - 2
 
-                    train_a = train_ds[train_ds["active"] == True]
+                train_a = train_ds[train_ds["active"] == True]
                     # train_d = train_ds[train_ds["active"]==False]
 
-                    if len(train_a) > components:
+                if len(train_a) > components:
                         # print("Generating GMM for actives...")
-                        G_a = GaussianMixture(n_components=components, covariance_type="full").fit(
-                            train_a.iloc[:, 0:numcols], train_a.iloc[:, numcols])
+                    G_a = GaussianMixture(n_components=components, covariance_type="full").fit(
+                        train_a.iloc[:, 0:numcols], train_a.iloc[:, numcols])
 
-                        results = pd.DataFrame()
+                    results = pd.DataFrame()
 
-                        print(numcols)
-                        results["a_score"] = [G_a.score(x[0].iloc[:, 0:numcols]) for x in
+                    print(numcols)
+                    results["a_score"] = [G_a.score(x[0].iloc[:, 0:numcols]) for x in
                                               val_ds]  # map(lambda x: G_a.score(x[0].iloc[:, 0:12]), test_ds)
-                        results["truth"] = [x[2] for x in val_ds]  # np.array(val_ds)[:,2]
+                    results["truth"] = [x[2] for x in val_ds]  # np.array(val_ds)[:,2]
 
-                        auc = eval.plotSimROC(np.array(results["truth"]), np.array([results["a_score"]]), "", None)
-                        mean_ef = eval.getMeanEFs(np.array(results["truth"]), np.array([results["a_score"]]))
+                    auc = eval.plotSimROC(np.array(results["truth"]), np.array([results["a_score"]]), "", None)
+                    mean_ef = eval.getMeanEFs(np.array(results["truth"]), np.array([results["a_score"]]))
 
-                        foldResults.append((auc, mean_ef))
-                    else:
-                        print("Training samples(" + str(len(train_a)) + ") < GMM components(" + str(
-                            components) + ") -> cannot train.")
-                        break
+                    foldResults.append((auc, mean_ef))
+                else:
+                    print("Training samples(" + str(len(train_a)) + ") < GMM components(" + str(
+                        components) + ") -> cannot train.")
+                    break
                         # foldResults.append(0)
 
-                print("X-Validation results, num components = " + str(components) + ": ")
-                print(foldResults)
+            print("X-Validation results, num components = " + str(components) + ": ")
+            print(foldResults)
 
-                if len(foldResults) > 0:
-                    mean_auc_sim = np.mean([x[0] for x in foldResults])
-                    std_auc_sim = np.std(np.mean([x[0] for x in foldResults]))
-                    mean_mean_ef_1pc = np.mean([x[1][0.01] for x in foldResults])
-                    std_mean_ef_1pc = np.std([x[1][0.01] for x in foldResults])
-                    mean_mean_ef_5pc = np.mean([x[1][0.05] for x in foldResults])
-                    std_mean_ef_5pc = np.std([x[1][0.05] for x in foldResults])
+            if len(foldResults) > 0:
+                mean_auc_sim = np.mean([x[0] for x in foldResults])
+                std_auc_sim = np.std(np.mean([x[0] for x in foldResults]))
+                mean_mean_ef_1pc = np.mean([x[1][0.01] for x in foldResults])
+                std_mean_ef_1pc = np.std([x[1][0.01] for x in foldResults])
+                mean_mean_ef_5pc = np.mean([x[1][0.05] for x in foldResults])
+                std_mean_ef_5pc = np.std([x[1][0.05] for x in foldResults])
 
-                    print("mean AUC=" + str(mean_auc_sim) +
+                print("mean AUC=" + str(mean_auc_sim) +
                           ", std=" + str(std_auc_sim) +
                           ", mean EF(1%)=" + str(mean_mean_ef_1pc) +
                           ", std=" + str(std_mean_ef_1pc) +
                           ", mean EF(5%)=" + str(mean_mean_ef_5pc) +
                           ", std=" + str(std_mean_ef_5pc))
 
-                    componentResults.append((molName, portion, components, mean_auc_sim, std_auc_sim, mean_mean_ef_1pc,
+                componentResults.append((molName, portion, components, mean_auc_sim, std_auc_sim, mean_mean_ef_1pc,
                                              std_mean_ef_1pc, mean_mean_ef_5pc, std_mean_ef_5pc))
-                else:
-                    print(
+            else:
+                print(
                         "X-Validation returned no results for " + str(components) + " components. Skipping training...")
-                    componentResults.append((molName, portion, components, 0, 0, 0, 0, 0, 0))
+                componentResults.append((molName, portion, components, 0, 0, 0, 0, 0, 0))
             # print(componentResults)
 
-            xvalResults.extend(componentResults)
+        xvalResults.extend(componentResults)
             # Find best score
-            aucs_rank = [x[5] for x in componentResults]
+        aucs_rank = [x[5] for x in componentResults]
 
-            best_components = componentsValues[np.argmax(aucs_rank)]
-            print("Best-score compnents no.: " + str(best_components))
+        best_components = componentsValues[np.argmax(aucs_rank)]
+        print("Best-score compnents no.: " + str(best_components))
 
-            (train_ds, train_paths) = cu.loadDescriptors(molfiles[molNdx][0], portion * 0.8, dtype=descType,
+        (train_ds, train_paths) = cu.loadDescriptors(molfiles[molNdx][0], portion * 0.8, dtype=descType,
                                                          active_decoy_ratio=0,
                                                          selection_policy="RANDOM", return_type="SEPARATE",
                                                          exclusion_list=test_paths)
 
-            train_ds = [x[0][0:1,:] for x in train_ds] #extract LECs
+        train_ds = [x[0][0:1,:] for x in train_ds] #extract LECs
+		
 
-
-            # molName = molfiles[molNdx][1]#[molfiles[molNdx].rfind("/", 0, -1)+1:-1]
-            if len(train_ds) > best_components:
-                t0 = time.time()
-                G_a = GaussianMixture(n_components=best_components, covariance_type="full").fit(
-                    train_ds.iloc[:, 0:numcols], train_ds.iloc[:, numcols])
-                results = pd.DataFrame()
-                results["a_score"] = [G_a.score(x[0].iloc[:, 0:numcols]) for x in test_ds]
-                results["truth"] = [x[2] for x in test_ds]  # np.array(test_ds)[:, 2]
-                auc = eval.plotSimROC(results["truth"], [results["a_score"]],
+        # molName = molfiles[molNdx][1]#[molfiles[molNdx].rfind("/", 0, -1)+1:-1]
+        if len(train_ds) > best_components:
+            t0 = time.time()
+            G_a = GaussianMixture(n_components=best_components, covariance_type="full").fit(
+                train_ds.iloc[:, 0:numcols], train_ds.iloc[:, numcols])
+            results = pd.DataFrame()
+            results["a_score"] = [G_a.score(x[0].iloc[:, 0:numcols]) for x in test_ds]
+            results["truth"] = [x[2] for x in test_ds]  # np.array(test_ds)[:, 2]
+            auc = eval.plotSimROC(results["truth"], [results["a_score"]],
                                       molName + "[GMM-" + str(components) + " components(Similarity), " + str(
                                           portion * 100) + "%]",
                                       "results/"+molName + "_GMM_sim_" + str(components) + "_" + str(portion * 100) + "_LEC.pdf")
-                auc_rank = eval.plotRankROC(results["truth"], [results["a_score"]],
+            auc_rank = eval.plotRankROC(results["truth"], [results["a_score"]],
                                             molName + "[GMM-" + str(components) + " components(Similarity), " + str(
                                                 portion * 100) + "%]",
                                             "results/"+molName + "_GMM_sim_" + str(components) + "_" + str(portion * 100) + "_LEC.pdf")
-                mean_ef = eval.getMeanEFs(np.array(results["truth"]), np.array([results["a_score"]]))
-                t1 = time.time()
-            else:
-                auc = 0
-                mean_ef = 0
+            mean_ef = eval.getMeanEFs(np.array(results["truth"]), np.array([results["a_score"]]))
+            t1 = time.time()
+        else:
+            auc = 0
+            mean_ef = 0
 
-            print("Final results, num components = ", str(components) + ": ")
-            print("AUC=" + str(auc))
-            print("EF: ", mean_ef)
+        print("Final results, num components = ", str(components) + ": ")
+        print("AUC=" + str(auc))
+        print("EF: ", mean_ef)
 
-            portionResults.append((molName, portion, best_components, auc, auc_rank, mean_ef, t1 - t0))
-        except:
-            portionResults.append((molName, portion, 0, 0, 0, 0, 0))
+        portionResults.append((molName, portion, best_components, auc, auc_rank, mean_ef, t1 - t0))
+#        except:
+#            print("Exception")
+#            portionResults.append((molName, portion, 0, 0, 0, 0, 0))
 
         f1 = open("results/results_gmm_"+molName+"_LEC.txt", 'w')
         print(xvalResults, file=f1)
         print(portionResults, file=f1)
         f1.close()
 
-        full_train_dss = [x[0][0:1,:] for x in test_ds]
-        full_train_dss.append([x[0][0:1,:] for x in n_fold_ds])
+        full_train_dss = [x[0].iloc[0:1,:] for x in test_ds]
+        full_train_dss.append([x[0].iloc[0:1,:] for x in n_fold_ds])
         full_train_ds = cu.joinDataframes(full_train_dss)
         G_a = GaussianMixture(n_components=best_components, covariance_type="full").fit(
             full_train_ds.iloc[:, 0:numcols],
@@ -187,9 +190,8 @@ portionResults = []
 xvalResults=[]
 
 numProcesses=4
-#p = Pool(numProcesses)
+p = Pool(numProcesses)
 
-#p.map(doMolGMM, range(0, len(molfiles)));
+p.map(doMolGMM, range(0, len(molfiles)));
 
-doMolGMM(0)
 #for molNdx in range(0, len(molfiles)):
